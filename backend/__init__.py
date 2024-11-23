@@ -1,10 +1,10 @@
 # Import classes
 from .monte_carlo import MonteCarloSimulation
-from .black_scholes_merton import BlackScholesModel
-from .sentiment_analysis import SentimentAnalysis
+from .black_scholes_merton import BlackScholesMertonModel
+from .sentiment_analysis import Stock_SentimentAnalysis
 
 # Import utility functions
-from .utils.data_fetching import fetch_stock_data
+from .utils.data_fetching import WebScraper
 
 # Import models
 from .models.sentiment_model import SentimentModel
@@ -13,7 +13,7 @@ from .models.sentiment_model import SentimentModel
 __all__ = [
     "MonteCarloSimulation",
     "BlackScholesModel",
-    "SentimentAnalysis",
-    "fetch_stock_data",
+    "Stock_SentimentAnalysis"
+    "WebScraper",
     "SentimentModel"
 ]

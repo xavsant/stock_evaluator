@@ -9,7 +9,7 @@ Index:
 
 #### [1] Description
 
-Web Application for Stock Evaluation using Monte Carlo Simulations, Black-Scholes-Merton Model for Stock Options, and Sentiment Analysis.
+Web Application for Portfolio Stock Evaluation using Monte Carlo Simulations, Black-Scholes-Merton Model for Stock Options, and Sentiment Analysis.
 
 #### [2] Structure
 
@@ -49,6 +49,8 @@ stock_evaluator/
 If any packages/dependencies are updated via poetry, be sure to export the requirements.txt using the following:
 `poetry export --without-hashes -f requirements.txt -o requirements.txt`
 
+For the end-state, imports of modules within the project are done using absolute filepaths. This is because of the nature of fastapi. To run specific files in isolation you will have to edit the imports (i.e. from backend.utils.data_fetching import WebScraper becomes from utils import Webscraper).
+
 **Live version:**
 WIP.
 *Note: Ensure your IP has been given access to use the live versions*
@@ -64,4 +66,12 @@ WIP.
     API Docs: [For interactively testing backend functions](http://0.0.0.0:8000/docs)
 
 #### [5] ToDo
-To add.
+- Make BSM variable names more comprehensive
+- Extract current price from stock
+- Figure out BSM plot issues
+- Account for required tokenizer for sentiment analysis
+- Update input and output hinting for class functions
+- Update dependencies in README
+- Add documentation to classes
+- Add comments to classes
+- Fix class names in __init__ 
