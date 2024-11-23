@@ -1,7 +1,7 @@
 # Import utility functions
-from .data_fetching import fetch_stock_data
+from .data_fetching import WebScraper
 
 # Expose imports so they are accessible directly from `utils`
 __all__ = [
-    "fetch_stock_data"
+    "WebScraper"
 ]
