@@ -12,7 +12,7 @@ class BlackScholesMertonModel:
         self.r = r
         self.S = S
         self.K = K
-        self.T = self._evaluate_fraction(T)
+        self.T = T/365
         self.sigma = sigma
         self.type_option = type_option
 
@@ -101,7 +101,7 @@ class BlackScholesMertonModel:
         return value
 
 if __name__ == "__main__":
-    bs_model = BlackScholesMertonModel(r=0.02, S=90.83, K=40.0, T=441/365, sigma=0.2046, type_option="c")
+    bs_model = BlackScholesMertonModel(r=0.02, S=90.83, K=40.0, T=441, sigma=0.2046, type_option="c")
     print("Option Price:", bs_model.option_price())
     print("Delta:", bs_model.delta())
     print("Gamma:", bs_model.gamma())

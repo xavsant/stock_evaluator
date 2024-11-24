@@ -12,14 +12,14 @@ from io import BytesIO
 from backend.utils.data_fetching import StockData
 
 class MonteCarloSimulation:
-    def __init__(self, stock_data: StockData, num_simulations=100, timeframe=100, initial_portfolio=10000):
+    def __init__(self, stock_data: StockData, forecast_timeframe=30, num_simulations=100, initial_portfolio_value=10000):
         if not isinstance(stock_data, StockData):
             raise TypeError("Expected an instance of the StockData class.")
         self.stock_data = stock_data
         self.stock_num = self.stock_data.stock_num
         self.num_sim = num_simulations
-        self.time = timeframe
-        self.init_port = initial_portfolio
+        self.time = forecast_timeframe
+        self.init_port = initial_portfolio_value
         self.sims_matrix = self._create_simulation_matrix()
         self.final_values = self.sims_matrix[-1]
 
@@ -209,7 +209,7 @@ if __name__ == "__main__":
     print("Correlation Matrix:", stock_data.corr_matrix)
 
     # Initialize the MonteCarlo class
-    monte_carlo = MonteCarloSimulation(stock_data=stock_data, num_simulations=100, timeframe=365)
+    monte_carlo = MonteCarloSimulation(stock_data=stock_data, forecast_timeframe=30, num_simulations=100)
 
     # INTERACTIVE PLOTS
     # Generate interactive plots

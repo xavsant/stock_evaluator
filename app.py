@@ -1,9 +1,20 @@
 # Imports
 import streamlit as st
 
-def main():
+# Mock backend function
+def backend_function(page, variable):
+    return f"Data fetched for {page} with variable: {variable}"
 
-    st.text("Hello World!")
+pages = {
+    "Functions": [
+        st.Page("streamlit/monte_carlo_app.py", title="Monte Carlo Simulation"),
+        st.Page("streamlit/black_scholes_merton_app.py", title="Black Scholes Merton"),
+        st.Page("streamlit/sentiment_analysis_app.py", title="Sentiment Analysis"),
+    ]
+}
 
-if __name__ == "__main__":
-    main()
+pg = st.navigation(pages)
+pg.run()
+
+
+

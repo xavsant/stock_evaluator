@@ -77,15 +77,16 @@ class WebScraper:
         if self.driver:
             self.driver.quit()
 
+
 class StockData:
     def __init__(self, stock_list, 
-                 start_date=dt.datetime.now() - dt.timedelta(days=100), 
+                 start_date=dt.datetime.now() - dt.timedelta(days=365), 
                  end_date=dt.datetime.now(), 
                  weights=None):
         self.stocks = stock_list
         self.start = start_date
         self.end = end_date
-        self.mean_returns, self.cov_matrix, self.corr_matrix = self.get_data()
+        self.mean_returns, self.cov_matrix, self.corr_matrix = self.get_data() # re-structure
 
         self.stock_num = len(self.mean_returns)
         if weights is not None:

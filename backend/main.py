@@ -11,7 +11,7 @@ from backend.monte_carlo import MonteCarloSimulation
 # Utility
 from backend.utils.data_fetching import StockData
 from pydantic import BaseModel
-from typing import List, Union
+from typing import List
 from datetime import datetime, timedelta
 
 app = FastAPI(
@@ -37,14 +37,15 @@ class BlackScholesMertonRequest(BaseModel):
     r: float = 0.02
     S: float = 10
     K: float = 15
-    T: Union[float, str] = 1
+    T: int = 548
     sigma: float = 0.2
     type_option: str = "c"
 
 class StockSymbolsRequest(BaseModel):
     stock_symbols: List[str] = ["AAPL"]
+    historical_timeframe: int = 365
+    forecast_timeframe: int = 30
     num_simulations: int = 100
-    timeframe: int = 90
 
 @app.on_event("startup")
 async def startup_event():
@@ -77,12 +78,12 @@ async def initialise_monte_carlo(request: StockSymbolsRequest):
     global monte_carlo_instance
     
     # Initialise or reinitialise the MonteCarloSimulation instance
-    start_date = datetime.now() - timedelta(days=request.timeframe)
+    start_date = datetime.now() - timedelta(days=request.historical_timeframe)
     stock_data = StockData(stock_list=request.stock_symbols, start_date=start_date)
     monte_carlo_instance = MonteCarloSimulation(
         stock_data=stock_data,
         num_simulations=request.num_simulations,
-        timeframe=request.timeframe
+        forecast_timeframe=request.forecast_timeframe
     )
     
     return {"message": "Monte Carlo simulation initialised successfully"}
