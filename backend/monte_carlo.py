@@ -12,26 +12,33 @@ from io import BytesIO
 from backend.utils.data_fetching import StockData
 
 class MonteCarloSimulation:
-    def __init__(self, stock_data: StockData, forecast_timeframe=30, num_simulations=100, initial_portfolio_value=10000):
+    def __init__(self, stock_data: StockData, forecast_timeframe=30, num_simulations=100, init_portfolio_value = None):
         if not isinstance(stock_data, StockData):
             raise TypeError("Expected an instance of the StockData class.")
         self.stock_data = stock_data
-        self.stock_num = self.stock_data.stock_num
+        self.stock_len = self.stock_data.stock_len
         self.num_sim = num_simulations
         self.time = forecast_timeframe
-        self.init_port = initial_portfolio_value
+        #initial portfolio value defaults to portfolio fetched by StockData class but can also be adjusted by user
+        if init_portfolio_value is not None:
+              self.init_portfolio_value = init_portfolio_value
+        else:
+            self.init_portfolio_value = sum(self.stock_data.values)
         self.sims_matrix = self._create_simulation_matrix()
         self.final_values = self.sims_matrix[-1]
 
+    def get_key_data(self):
+        return self.stock_data.get_key_data()
+
     def _create_simulation_matrix(self):
-        mean_matrix = np.full(shape=(self.time, self.stock_num), fill_value=self.stock_data.mean_returns).T
+        mean_matrix = np.full(shape=(self.time, self.stock_len), fill_value=self.stock_data.mean_returns).T
         sims_matrix = np.zeros((self.time, self.num_sim))
 
         for m in range(self.num_sim):
-            Z = np.random.normal(size=(self.time, self.stock_data.stock_num))
+            Z = np.random.normal(size=(self.time, self.stock_data.stock_len))
             L = np.linalg.cholesky(self.stock_data.cov_matrix)
             daily_returns = mean_matrix + np.inner(L, Z)
-            sims_matrix[:, m] = np.cumprod(np.inner(self.stock_data.weights, daily_returns.T) + 1) * self.init_port
+            sims_matrix[:, m] = np.cumprod(np.inner(self.stock_data.weights, daily_returns.T) + 1) * self.init_portfolio_value
         return sims_matrix
 
     def plot_simulation_lines(self, return_as_json: bool = True):
@@ -84,6 +91,7 @@ class MonteCarloSimulation:
             title="Average Simulated Portfolio Value",
             xaxis_title="Days",
             yaxis_title="Portfolio Value (USD)",
+            yaxis=dict(range=[self.sims_matrix.min() - 100, self.sims_matrix.max() + 100]),
             template="plotly_white"
         )
 
@@ -140,7 +148,7 @@ class MonteCarloSimulation:
         # Calculate risk metrics
         std_dev = np.std(self.final_values)
         mean_return = np.mean(self.final_values)
-        sharpe_ratio = (mean_return - self.init_port) / std_dev
+        sharpe_ratio = (mean_return - self.init_portfolio_value) / std_dev
 
         # Generate insights
         insights = []
@@ -204,12 +212,14 @@ if __name__ == "__main__":
     stock_data = StockData(stock_list=stock_symbols, start_date=start_date)
 
     # Print the data to verify it works
+    print("Mean Prices:", stock_data.mean_price) 
     print("Mean Returns:", stock_data.mean_returns)
     print("Covariance Matrix:", stock_data.cov_matrix)
     print("Correlation Matrix:", stock_data.corr_matrix)
 
     # Initialize the MonteCarlo class
     monte_carlo = MonteCarloSimulation(stock_data=stock_data, forecast_timeframe=30, num_simulations=100)
+    print("Initial Portfolio Value:", monte_carlo.init_portfolio_value)
 
     # INTERACTIVE PLOTS
     # Generate interactive plots

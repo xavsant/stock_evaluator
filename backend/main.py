@@ -42,10 +42,11 @@ class BlackScholesMertonRequest(BaseModel):
     type_option: str = "c"
 
 class StockSymbolsRequest(BaseModel):
-    stock_symbols: List[str] = ["AAPL"]
+    stock_symbols: List[str] = ["AAPL", "TSLA", "AMZN"]
     historical_timeframe: int = 365
     forecast_timeframe: int = 30
     num_simulations: int = 100
+    num_each_stock: List[int] = [20, 30, 50]
 
 @app.on_event("startup")
 async def startup_event():
@@ -79,7 +80,7 @@ async def initialise_monte_carlo(request: StockSymbolsRequest):
     
     # Initialise or reinitialise the MonteCarloSimulation instance
     start_date = datetime.now() - timedelta(days=request.historical_timeframe)
-    stock_data = StockData(stock_list=request.stock_symbols, start_date=start_date)
+    stock_data = StockData(stock_list=request.stock_symbols, start_date=start_date, num_each_stock=request.num_each_stock)
     monte_carlo_instance = MonteCarloSimulation(
         stock_data=stock_data,
         num_simulations=request.num_simulations,
@@ -125,7 +126,15 @@ async def black_scholes_merton_option(tr_type: str, op_pr: float):
 # ---
 # Monte Carlo Simulations
 # ---
-@app.post("/plot_simulation_lines")
+@app.post("/monte_carlo/keydata")
+async def get_key_data():
+    if monte_carlo_instance is None:
+        raise HTTPException(status_code=500, detail="Monte Carlo instance not initialised")
+    
+    key_data = monte_carlo_instance.get_key_data()
+    return key_data
+
+@app.post("/monte_carlo/plot_simulation_lines")
 async def plot_simulation_lines():
     if monte_carlo_instance is None:
         raise HTTPException(status_code=500, detail="Monte Carlo instance not initialised")
@@ -133,7 +142,7 @@ async def plot_simulation_lines():
     plot_json = monte_carlo_instance.plot_simulation_lines(return_as_json=True)
     return plot_json
 
-@app.post("/plot_simulation_avg")
+@app.post("/monte_carlo/plot_simulation_avg")
 async def plot_simulation_avg():
     if monte_carlo_instance is None:
         raise HTTPException(status_code=500, detail="Monte Carlo instance not initialised")
@@ -141,7 +150,7 @@ async def plot_simulation_avg():
     plot_json = monte_carlo_instance.plot_simulation_avg(return_as_json=True)
     return plot_json
 
-@app.post("/plot_histogram_with_risk_metrics")
+@app.post("/monte_carlo/plot_histogram_with_risk_metrics")
 async def plot_histogram_with_risk_metrics():
     if monte_carlo_instance is None:
         raise HTTPException(status_code=500, detail="Monte Carlo instance not initialised")
@@ -149,7 +158,7 @@ async def plot_histogram_with_risk_metrics():
     plot_json = monte_carlo_instance.plot_histogram_with_risk_metrics(return_as_json=True)
     return plot_json
 
-@app.post("/plot_corr_heatmap")
+@app.post("/monte_carlo/plot_corr_heatmap")
 async def plot_corr_heatmap():
     if monte_carlo_instance is None:
         raise HTTPException(status_code=500, detail="Monte Carlo instance not initialised")
@@ -157,7 +166,7 @@ async def plot_corr_heatmap():
     corr_heatmap = monte_carlo_instance.corr_heatmap()
     return StreamingResponse(corr_heatmap, media_type="image/png")
 
-@app.post("/generate_risk_metrics")
+@app.post("/monte_carlo/generate_risk_metrics")
 async def generate_risk_metrics():
     if monte_carlo_instance is None:
         raise HTTPException(status_code=500, detail="Monte Carlo instance not initialised")
