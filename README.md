@@ -69,6 +69,7 @@ WIP.
 - Make BSM variable names more comprehensive
 - Extract current price from stock
 - Figure out BSM plot issues
+- Add caching for each frontend function
 - Account for required tokenizer for sentiment analysis
 - Update input and output hinting for class functions
 - Update dependencies in README
