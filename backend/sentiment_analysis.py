@@ -3,6 +3,7 @@ from backend.utils.data_fetching import WebScraper
 
 # Sentiment Analysis
 import nltk
+nltk.download('stopwords')
 from nltk.util import ngrams
 import gensim
 import contractions

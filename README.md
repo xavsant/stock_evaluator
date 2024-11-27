@@ -57,7 +57,7 @@ WIP.
 
 **Locally with Docker:**
 1. Run `docker build -t image_name -f Dockerfile_name .` in your command line
-2. Run `docker run --env-file .env -p 0.0.0.0:80:80 image_name` for backend, `docker run -p 8501:8501 image_name` for frontend in your command line
+2. Run `docker run -p 0.0.0.0:80:80 image_name` for backend, `docker run -p 8501:8501 image_name` for frontend in your command line
 3. Open up `0.0.0.0:80/docs` for backend, `0.0.0.0:8501` for frontend in your browser  
 ---
 ***Locally without Docker***

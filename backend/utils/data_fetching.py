@@ -2,6 +2,7 @@
 from bs4 import BeautifulSoup
 import selenium.webdriver as webdriver
 from selenium.webdriver.chrome.options import Options
+# from selenium.webdriver.chrome.service import Service # Docker
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
@@ -25,12 +26,27 @@ class WebScraper:
         self.headline_list = []
         self.article_list = []
 
+    # For local
     def setup_driver(self):
         chrome_options = Options()
         chrome_options.add_argument("--headless")
         self.driver = webdriver.Chrome(options=chrome_options)
         self.driver.get(self.url)
         self.driver.maximize_window()
+
+    # For container
+    # def setup_driver(self):
+    #     chrome_options = Options()
+    #     chrome_options.add_argument("--headless")  # Run in headless mode (without GUI)
+    #     chrome_options.add_argument("--no-sandbox")
+    #     chrome_options.add_argument("--disable-dev-shm-usage")
+        
+    #     # Use the correct binary and driver paths for ARM architecture
+    #     chrome_options.binary_location = '/usr/bin/chromium'  # Path to Chromium
+    #     service = Service(executable_path='/usr/local/bin/chromedriver')  # Path to ChromeDriver
+        
+    #     self.driver = webdriver.Chrome(service=service, options=chrome_options)
+    #     self.driver.get(self.url)
 
     def accept_cookies(self):
         consent_button = WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='consent-page']/div/div/div/form/div[2]/div[2]/button[1]")))

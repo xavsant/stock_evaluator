@@ -1,0 +1,76 @@
+FROM python:3.11.9-bullseye
+
+# Create directories
+WORKDIR /code
+
+RUN mkdir -p /backend
+
+RUN mkdir -p /backend/models
+
+RUN mkdir -p /backend/utils
+
+# Copy over files
+COPY ./requirements.txt /code/requirements.txt
+
+COPY ./backend/black_scholes_merton.py /code/backend/black_scholes_merton.py
+
+COPY ./backend/monte_carlo.py /code/backend/monte_carlo.py
+
+COPY ./backend/sentiment_analysis.py /code/backend/sentiment_analysis.py
+
+COPY ./backend/main.py /code/backend/main.py
+
+COPY ./backend/models/dictionary.pkl /code/backend/models/dictionary.pkl
+
+COPY ./backend/models/maxent_sentiment_classifier.pkl /code/backend/models/maxent_sentiment_classifier.pkl
+
+COPY ./backend/utils/data_fetching.py /code/backend/utils/data_fetching.py
+
+# Install dependencies
+RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+
+# # Download necessary NLTK data during build process
+# RUN python -m nltk.downloader stopwords
+
+# # Install necessary dependencies for Chromium
+# RUN apt-get update && apt-get install -y \
+#     wget \
+#     gnupg2 \
+#     curl \
+#     unzip \
+#     chromium \
+#     libxss1 \
+#     libappindicator3-1 \
+#     libgdk-pixbuf2.0-0 \
+#     libnspr4 \
+#     libnss3 \
+#     libatk-bridge2.0-0 \
+#     libatk1.0-0 \
+#     libcups2 \
+#     libx11-xcb1 \
+#     libgbm1 \
+#     libasound2 \
+#     libpangocairo-1.0-0 \
+#     libgdk-pixbuf2.0-0 \
+#     libatspi2.0-0 \
+#     libcurl4 \
+#     libxcomposite1 \
+#     libxdamage1 \
+#     fonts-liberation \
+#     libappindicator3-1 \
+#     xdg-utils \
+#     --no-install-recommends && apt-get clean
+
+# # Install the corresponding version of ChromeDriver
+# RUN CHROME_DRIVER_VERSION=$(curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE) && \
+#     wget https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip && \
+#     unzip chromedriver_linux64.zip -d /usr/local/bin/ && \
+#     rm chromedriver_linux64.zip
+
+# # Set environment variables for Chrome and ChromeDriver
+# ENV CHROME_BIN=/usr/bin/chromium
+# ENV CHROMEDRIVER_PATH=/usr/local/bin/chromedriver
+
+EXPOSE 80
+
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "80"]
