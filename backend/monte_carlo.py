@@ -24,7 +24,7 @@ class MonteCarloSimulation:
               self.init_portfolio_value = init_portfolio_value
         else:
             self.init_portfolio_value = sum(self.stock_data.values)
-        self.sims_matrix = self._create_simulation_matrix()
+        self.stock_sims_matrix, self.sims_matrix = self._create_simulation_matrix()
         self.final_values = self.sims_matrix[-1]
 
     def get_key_data(self):
@@ -32,15 +32,25 @@ class MonteCarloSimulation:
 
     def _create_simulation_matrix(self):
         mean_matrix = np.full(shape=(self.time, self.stock_len), fill_value=self.stock_data.mean_returns).T
+        
+        #store simulated performance of individual stock
+        stock_sims_matrix = np.zeros((self.time, self.num_sim, self.stock_len)) 
+        mean_price = np.array(self.stock_data.mean_price) 
+
         sims_matrix = np.zeros((self.time, self.num_sim))
 
         for m in range(self.num_sim):
             Z = np.random.normal(size=(self.time, self.stock_data.stock_len))
             L = np.linalg.cholesky(self.stock_data.cov_matrix)
             daily_returns = mean_matrix + np.inner(L, Z)
-            sims_matrix[:, m] = np.cumprod(np.inner(self.stock_data.weights, daily_returns.T) + 1) * self.init_portfolio_value
-        return sims_matrix
 
+            cumulative_returns = np.cumprod(daily_returns + 1, axis=0)
+            stock_prices = cumulative_returns * mean_price.reshape(-1, 1)
+            stock_sims_matrix[:, m, :] = stock_prices.T
+            
+            sims_matrix[:, m] = np.cumprod(np.inner(self.stock_data.weights, daily_returns.T) + 1) * self.init_portfolio_value
+        return stock_sims_matrix, sims_matrix
+    
     def plot_simulation_lines(self, return_as_json: bool = True):
         """Generates interactive simulation lines using Plotly."""
         days = list(range(self.sims_matrix.shape[0]))
@@ -97,6 +107,51 @@ class MonteCarloSimulation:
 
         formatted_fig = self._return_format(fig, return_as_json = return_as_json)
         return formatted_fig
+    
+    def plot_individual_prices(self, return_as_json: bool = True):
+        days = list(range(self.stock_sims_matrix.shape[0]))  # Time steps (days)
+        fig = go.Figure()
+        for index, stock in enumerate(self.stock_data.stocks):
+            average_prices = np.mean(self.stock_sims_matrix[:, :, index], axis=1)
+            fig.add_trace(go.Scatter(
+                x=days,
+                y=average_prices,
+                mode='lines+markers',
+                name=stock,
+                line=dict(width=1.5),
+            ))
+
+        fig.update_layout(
+            title="Average Simulated Performance of Individual Stocks (Prices)",
+            xaxis_title="Days",
+            yaxis_title="Stock Price (USD)",
+            template="plotly_white"
+        )
+
+        formatted_fig = self._return_format(fig, return_as_json=return_as_json)
+        return formatted_fig
+
+    def plot_individual_cumulative_returns(self, return_as_json: bool = True):
+        days = list(range(self.stock_sims_matrix.shape[0]))  # Time steps (days)
+        fig = go.Figure()
+        for index, stock in enumerate(self.stock_data.stocks):
+            cumulative_returns = np.mean(self.stock_sims_matrix[:, :, index], axis=1) / self.stock_data.mean_price[index] - 1
+            fig.add_trace(go.Scatter(
+                x=days,
+                y=cumulative_returns,
+                mode='lines+markers',
+                name=stock,
+                line=dict(width=1.5),
+            ))
+
+        fig.update_layout(
+            title="Average Simulated Performance of Individual Stocks (Returns)",
+            xaxis_title="Days",
+            yaxis_title="Cumulative Returns",
+            template="plotly_white"
+        )
+        formatted_fig = self._return_format(fig, return_as_json=return_as_json)
+        return formatted_fig
 
     def plot_histogram_with_risk_metrics(self, return_as_json: bool = True):
         """Generates histogram with VaR and CVaR using Plotly."""
@@ -121,7 +176,7 @@ class MonteCarloSimulation:
         return formatted_fig
     
     def corr_heatmap(self):
-        """Generates a static correlation heatmap as an image buffer."""
+        """Generates a static correlation heatmap as an image buffer with a transparent background and white text."""
         plt.figure(figsize=(8, 8))
         sns.heatmap(
             self.stock_data.corr_matrix,
@@ -133,17 +188,36 @@ class MonteCarloSimulation:
             yticklabels=self.stock_data.stocks,
             vmin=-1,
             vmax=1,
-            cbar_kws={'label': 'Correlation Coefficient'}
+            cbar_kws={"label": "Correlation Coefficient", "shrink": 0.4},
+            annot_kws={"size": 12, "color": "white", "weight": "bold"},
+            linewidths=2.2,
+            linecolor=(0,0,0,1) 
         )
-        plt.title("Stock Correlation Matrix")
-        
+
+        # Customize text and background
+        plt.title("Stock Correlation Matrix", color="white")
+        plt.xticks(color="white")
+        plt.yticks(color="white")
+
+        # Set transparent background
+        fig = plt.gcf()
+        fig.patch.set_facecolor('none')
+        ax = plt.gca()
+        ax.set_facecolor('none')
+
+        # Customize the color bar tick labels
+        cbar = ax.collections[0].colorbar
+        cbar.set_ticks([-1, 0, 1])
+        cbar.ax.tick_params(labelcolor = "white")
+        cbar.set_label("Correlation Coefficient", color='white')
+
         # Save to a buffer
         buf = BytesIO()
-        plt.savefig(buf, format='png', bbox_inches='tight', pad_inches=0.1)
+        plt.savefig(buf, format='png', transparent=True, bbox_inches='tight', pad_inches=0.1)
         plt.close()
         buf.seek(0)
         return buf
-    
+
     def display_risk_metrics_table_with_insights(self):
         # Calculate risk metrics
         std_dev = np.std(self.final_values)
@@ -225,11 +299,15 @@ if __name__ == "__main__":
     # Generate interactive plots
     plot_simulation_lines = monte_carlo.plot_simulation_lines(return_as_json = False)
     plot_simulation_avg = monte_carlo.plot_simulation_avg(return_as_json = False)
+    plot_individual_prices = monte_carlo.plot_individual_prices(return_as_json = False)
+    plot_individual_cumulative_returns = monte_carlo.plot_individual_cumulative_returns(return_as_json = False)
     plot_histogram_with_risk_metrics = monte_carlo.plot_histogram_with_risk_metrics(return_as_json = False)
 
     # Save the generated JSON files locally for testing
     pio.write_json(plot_simulation_lines, "notebooks/monte_carlo/simulation_lines.json")
     pio.write_json(plot_simulation_avg, "notebooks/monte_carlo/simulation_avg.json")
+    pio.write_json(plot_individual_prices, "notebooks/monte_carlo/individual_prices.json")
+    pio.write_json(plot_individual_cumulative_returns, "notebooks/monte_carlo/individual_cumulative_returns.json")
     pio.write_json(plot_histogram_with_risk_metrics, "notebooks/monte_carlo/histogram_with_risk_metrics.json")
 
     print("JSON files have been saved for frontend testing!")
@@ -238,11 +316,15 @@ if __name__ == "__main__":
     # Load the JSON files
     plot_simulation_lines_json = pio.read_json("notebooks/monte_carlo/simulation_lines.json")
     plot_simulation_avg_json = pio.read_json("notebooks/monte_carlo/simulation_avg.json")
+    plot_individual_prices = pio.read_json("notebooks/monte_carlo/individual_prices.json")
+    plot_individual_cumulative_returns = pio.read_json("notebooks/monte_carlo/individual_cumulative_returns.json")
     plot_histogram_with_risk_metrics_json = pio.read_json("notebooks/monte_carlo/histogram_with_risk_metrics.json")
-    
+
     # Run the JSON files
     plot_simulation_lines_json.show()
     plot_simulation_avg_json.show()
+    plot_individual_prices.show()
+    plot_individual_cumulative_returns.show()
     plot_histogram_with_risk_metrics_json.show()
 
     # STILL PLOTS

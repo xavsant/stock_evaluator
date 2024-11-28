@@ -45,10 +45,10 @@ class BlackScholesMertonRequest(BaseModel):
 
 class StockSymbolsRequest(BaseModel):
     stock_symbols: List[str] = ["AAPL", "TSLA", "AMZN"]
+    num_each_stock: List[int] = [20, 30, 50]
     historical_timeframe: int = 365
     forecast_timeframe: int = 30
     num_simulations: int = 100
-    num_each_stock: List[int] = [20, 30, 50]
 
 @app.on_event("startup")
 async def startup_event():
@@ -131,7 +131,7 @@ async def black_scholes_merton_option():
 # ---
 # Monte Carlo Simulations
 # ---
-@app.post("/monte_carlo/keydata")
+@app.post("/monte_carlo/key_data")
 async def get_key_data():
     if monte_carlo_instance is None:
         raise HTTPException(status_code=500, detail="Monte Carlo instance not initialised.")
@@ -153,6 +153,22 @@ async def plot_simulation_avg():
         raise HTTPException(status_code=500, detail="Monte Carlo instance not initialised.")
     
     plot_json = monte_carlo_instance.plot_simulation_avg(return_as_json=True)
+    return plot_json
+
+@app.post("/monte_carlo/plot_individual_prices")
+async def plot_individual_prices():
+    if monte_carlo_instance is None:
+        raise HTTPException(status_code=500, detail="Monte Carlo instance not initialised.")
+    
+    plot_json = monte_carlo_instance.plot_individual_prices(return_as_json=True)
+    return plot_json
+
+@app.post("/monte_carlo/plot_individual_cumulative_returns")
+async def plot_individual_cumulative_returns():
+    if monte_carlo_instance is None:
+        raise HTTPException(status_code=500, detail="Monte Carlo instance not initialised.")
+    
+    plot_json = monte_carlo_instance.plot_individual_cumulative_returns(return_as_json=True)
     return plot_json
 
 @app.post("/monte_carlo/plot_histogram_with_risk_metrics")

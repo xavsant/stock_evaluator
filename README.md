@@ -12,7 +12,7 @@ Index:
 Web Application for Portfolio Stock Evaluation using Monte Carlo Simulations, Black-Scholes-Merton Model for Stock Options, and Sentiment Analysis.
 
 #### [2] Structure
-
+```
 stock_evaluator/
 │
 ├── app.py                      # Streamlit app with options to select analysis and view results
@@ -30,12 +30,18 @@ stock_evaluator/
 │       ├── __init__.py            
 │       └── sentiment_model.py        
 │
+├── streamlit/                  # Streamlit pages
+│   ├── black_scholes_merton_app.py
+│   ├── monte_carlo_app.py
+│   └── sentiment_analysis_app.py  
+│
 ├── notebooks/
 │   └── ...                     # For feature experimentation
 ├── Dockerfile_frontend
 ├── Dockerfile_backend
 ├── requirements.txt            # Dependencies
-└── README.md                   # Documentation on how to set up and run the app
+└── README.md
+```
 
 #### [3] Dependencies
 
@@ -67,10 +73,10 @@ WIP.
 
 #### [5] ToDo
 - Make BSM variable names more comprehensive
-- Extract current price from stock
+- Extract current price from stock for BSM
 - Figure out BSM plot issues
 - Add caching for each frontend function
-- Account for required tokenizer for sentiment analysis
+- Fix Selenium and Docker issues
 - Update input and output hinting for class functions
 - Update dependencies in README
 - Add documentation to classes
