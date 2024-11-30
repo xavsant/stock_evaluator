@@ -83,3 +83,5 @@ ipython_config.py
 notebooks/monte_carlo/histogram_with_risk_metrics.json
 notebooks/monte_carlo/simulation_avg.json
 notebooks/monte_carlo/simulation_lines.json
+notebooks/monte_carlo/individual_cumulative_returns.json
+notebooks/monte_carlo/individual_prices.json

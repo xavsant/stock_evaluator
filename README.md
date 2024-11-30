@@ -74,7 +74,8 @@ WIP.
 #### [5] ToDo
 - Make BSM variable names more comprehensive
 - Extract current price from stock for BSM
-- Figure out BSM plot issues
+- Add error handling for incorrect input values in streamlit
+- Beautify BSM plot
 - Add caching for each frontend function
 - Fix Selenium and Docker issues
 - Update input and output hinting for class functions
