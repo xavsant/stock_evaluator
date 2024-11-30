@@ -83,3 +83,4 @@ WIP.
 - Add documentation to classes
 - Add comments to classes
 - Fix class names in __init__ 
+- Only use pickle for models, use JSON for dict
