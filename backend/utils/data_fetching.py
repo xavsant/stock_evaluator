@@ -2,7 +2,6 @@
 from bs4 import BeautifulSoup
 
 # Fetching Stock Data Imports
-import numpy as np
 import yfinance as yf
 import datetime as dt
 
@@ -68,34 +67,55 @@ class WebScraper:
 
 class StockData:
     def __init__(self, stock_list, 
-                 start_date=dt.datetime.now() - dt.timedelta(days=100), 
+                 start_date=dt.datetime.now() - dt.timedelta(days=365), 
                  end_date=dt.datetime.now(), 
-                 weights=None):
+                 num_each_stock = None): #number of each stocks as input
         self.stocks = stock_list
         self.start = start_date
         self.end = end_date
-        self.mean_returns, self.cov_matrix, self.corr_matrix = self.get_data()
+        # added self.mean_price to calculate self.values
+        self.mean_price, self.mean_returns, self.cov_matrix, self.corr_matrix = self._get_data() # re-structure
+        self.stock_len = len(self.mean_returns)
 
-        self.stock_num = len(self.mean_returns)
-        if weights is not None:
-            if len(weights) != len(stock_list):
-                raise ValueError("Weights do not match the number of stocks inputted.")
-            self.weights = weights
+        # if number of each stock is not inputted, default to 100 for each stock
+        if num_each_stock is not None:
+            if len(num_each_stock) != len(stock_list):
+                raise ValueError("Length of numbers provided does not match number of stocks in portfolio.")
+            self.num_each_stock = num_each_stock
         else:
-            self.weights = self.set_weights()
-    
-    def get_data(self):
+            self.num_each_stock = [100] * self.stock_len
+
+        # added self.values to get a list of (number of each stock)*(mean price of each stock)
+        self.values, self.weights = self._find_weights()
+        self.port_value = sum(self.values)
+
+    def get_key_data(self):
+        output = {
+            "stock": self.stocks,
+            "mean_price_per_stock": self.mean_price,
+            "mean_return_per_stock": self.mean_returns,
+            "shares_per_stock": self.num_each_stock,
+            "portfolio_weight": self.weights,
+            "value_per_stock": self.values,
+            "portfolio_value": self.port_value
+        }
+
+        return output
+
+    def _get_data(self):
         df = yf.download(self.stocks, self.start, self.end)
-        print(df)
+        # print(df)
         df_close = df["Close"]
-        print(df_close)
+        # print(df_close)
+        mean_price = df_close.mean()
         returns = df_close.pct_change()
         mean_returns = returns.mean()
         cov_matrix = returns.cov()
         corr_matrix = returns.corr()
-        return mean_returns, cov_matrix, corr_matrix 
-    
-    def set_weights(self):
-        weights = np.random.random(self.stock_num)
-        weights /= np.sum(weights)
-        return weights
+        return mean_price, mean_returns, cov_matrix, corr_matrix 
+
+    #calculate weights based on number of each stock and each stock's mean prices
+    def _find_weights(self):
+        values = [num * value for num, value in zip(self.num_each_stock, self.mean_price)]
+        weights = [value / sum(values) for value in values] 
+        return values, weights

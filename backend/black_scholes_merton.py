@@ -1,7 +1,6 @@
 # Imports
 import numpy as np
 from scipy.stats import norm
-# import opstrat as op
 
 # Utility
 from io import BytesIO

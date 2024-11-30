@@ -5,7 +5,6 @@ from backend.utils.data_fetching import WebScraper
 import nltk
 from nltk.util import ngrams
 # nltk.download('stopwords')
-# import gensim
 import contractions
 import pickle
 
