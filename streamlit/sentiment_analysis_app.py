@@ -1,6 +1,10 @@
 # Imports
 import streamlit as st
 from requests import post as rpost
+from os import environ
+
+# Initialise POST URL
+backend_url = environ["BACKEND_URL"]
 
 def get_tickers():
     if "tickers" in st.session_state:
@@ -14,7 +18,7 @@ def sentiment_request(stock: str):
      parameters = {"stock": stock}
 
      response = rpost(
-          url="http://0.0.0.0:8000/stock_sentiment_analysis",
+          url=backend_url+"/stock_sentiment_analysis",
           headers=header,
           params=parameters
      )

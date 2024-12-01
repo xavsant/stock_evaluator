@@ -1,12 +1,16 @@
 # Imports
 import streamlit as st
 from requests import post as rpost
+from os import environ
 
 # Plot Imports
 import plotly.graph_objects as go
 from json import loads
 from PIL import Image
 from io import BytesIO
+
+# Initialise POST URL
+backend_url = environ["BACKEND_URL"]
 
 # Initialize tabs
 tab_simulation, tab_correlation_matrix, tab_simulation_average, tab_individual_cumulative_returns, tab_var_histogram, tab_risk_metrics_summary_table = st.tabs(["Simulation", "Correlation Matrix", "Simulation Average", "Individual Cumulative Returns", "VaR Histogram", "Risk Metrics Summary Table"])
@@ -29,7 +33,7 @@ def monte_carlo_initialise_request(stock_symbols: list, num_each_stock: list, hi
          }
 
      response = rpost(
-          url="http://0.0.0.0:8000/initialise_monte_carlo",
+          url=backend_url+"/initialise_monte_carlo",
           headers=header,
           json=parameters
      )
@@ -40,7 +44,7 @@ def monte_carlo_get_key_data():
     header = {"Content-Type": "application/json"}
 
     response = rpost(
-          url="http://0.0.0.0:8000/monte_carlo/key_data",
+          url=backend_url+"/monte_carlo/key_data",
           headers=header
      )
 
@@ -48,7 +52,7 @@ def monte_carlo_get_key_data():
 
 def monte_carlo_plot_simulation_lines():
     response = rpost(
-          url="http://0.0.0.0:8000/monte_carlo/plot_simulation_lines"
+          url=backend_url+"/monte_carlo/plot_simulation_lines"
      )
 
     plot_json = response.json()
@@ -58,7 +62,7 @@ def monte_carlo_plot_simulation_lines():
 
 def monte_carlo_plot_simulation_avg():
     response = rpost(
-          url="http://0.0.0.0:8000/monte_carlo/plot_simulation_avg"
+          url=backend_url+"/monte_carlo/plot_simulation_avg"
      )
 
     plot_json = response.json()
@@ -68,7 +72,7 @@ def monte_carlo_plot_simulation_avg():
 
 def monte_carlo_plot_individual_cumulative_returns():
     response = rpost(
-          url="http://0.0.0.0:8000/monte_carlo/plot_individual_cumulative_returns"
+          url=backend_url+"/monte_carlo/plot_individual_cumulative_returns"
      )
 
     plot_json = response.json()
@@ -78,7 +82,7 @@ def monte_carlo_plot_individual_cumulative_returns():
 
 def monte_carlo_plot_histogram_with_risk_metrics():
     response = rpost(
-          url="http://0.0.0.0:8000/monte_carlo/plot_histogram_with_risk_metrics"
+          url=backend_url+"/monte_carlo/plot_histogram_with_risk_metrics"
      )
 
     plot_json = response.json()
@@ -90,7 +94,7 @@ def monte_carlo_plot_corr_heatmap():
     header = {"Content-Type": "application/json"}
 
     response = rpost(
-          url="http://0.0.0.0:8000/monte_carlo/plot_corr_heatmap",
+          url=backend_url+"/monte_carlo/plot_corr_heatmap",
           headers=header,
           stream=True
     )
@@ -103,7 +107,7 @@ def monte_carlo_generate_risk_metrics():
     header = {"Content-Type": "application/json"}
 
     response = rpost(
-          url="http://0.0.0.0:8000/monte_carlo/generate_risk_metrics",
+          url=backend_url+"/monte_carlo/generate_risk_metrics",
           headers=header,
           stream=True
     )

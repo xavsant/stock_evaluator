@@ -2,10 +2,14 @@
 import streamlit as st
 from requests import post as rpost
 from backend.utils.data_fetching import Black_Scholes_Merton_StockData
+from os import environ
 
 # Plot Imports
 from PIL import Image
 from io import BytesIO
+
+# Initialise POST URL
+backend_url = environ["BACKEND_URL"]
 
 def get_tickers():
     if "tickers" in st.session_state:
@@ -41,7 +45,7 @@ def black_scholes_merton_initialise_request(interest_rate: float, spot_price: fl
          }
 
      response = rpost(
-          url="http://0.0.0.0:8000/initialise_black_scholes_merton",
+          url=backend_url+"/initialise_black_scholes_merton",
           headers=header,
           json=parameters
      )
@@ -52,7 +56,7 @@ def black_scholes_merton_get_greeks():
     header = {"Content-Type": "application/json"}
 
     response = rpost(
-          url="http://0.0.0.0:8000/black_scholes_merton_option/get_greeks",
+          url=backend_url+"/black_scholes_merton_option/get_greeks",
           headers=header
      )
 
@@ -62,7 +66,7 @@ def black_scholes_merton_plot_payoff():
     header = {"Content-Type": "application/json"}
 
     response = rpost(
-          url="http://0.0.0.0:8000/black_scholes_merton_option/plot_payoff",
+          url=backend_url+"/black_scholes_merton_option/plot_payoff",
           headers=header,
           stream=True
     )
