@@ -3,6 +3,7 @@ import streamlit as st
 from requests import post as rpost
 from backend.utils.data_fetching import Black_Scholes_Merton_StockData
 from os import environ
+import yfinance as yf # for streamlit webapp
 
 # Plot Imports
 from PIL import Image
@@ -10,9 +11,6 @@ from io import BytesIO
 
 # Initialise POST URL
 backend_url = environ["BACKEND_URL"]
-
-# import yfinance as yf
-
 
 def get_tickers():
     if "tickers" in st.session_state:
