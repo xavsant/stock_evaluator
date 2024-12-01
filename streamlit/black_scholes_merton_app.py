@@ -11,14 +11,8 @@ from io import BytesIO
 # Initialise POST URL
 backend_url = environ["BACKEND_URL"]
 
-import yfinance as yf
+# import yfinance as yf
 
-try:
-    ticker = "AAPL"
-    data = yf.download(ticker, period="1d")
-    st.write("Yahoo Finance API response:", data)
-except Exception as e:
-    st.error(f"Error accessing Yahoo Finance: {e}")
 
 def get_tickers():
     if "tickers" in st.session_state:
