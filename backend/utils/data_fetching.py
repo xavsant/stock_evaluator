@@ -4,7 +4,6 @@ from bs4 import BeautifulSoup
 # Fetching Stock Data
 import yfinance as yf
 import datetime as dt
-import pandas as pd
 import requests
 
 # Utility
@@ -173,14 +172,6 @@ class Finnhub:
             for ticker in tickers
             if ticker["mic"] == "XNAS"
         ]
-
-        # nasdaq_tickers = [
-        #     {"Symbol": ticker["symbol"], "Company Name": ticker["description"]}
-        #     for ticker in tickers
-        #     if ticker["mic"] == "XNAS"
-        # ]
-
-        # nasdaq_tickers_sorted = sorted(nasdaq_tickers, key=lambda x: x["Symbol"])
 
         nasdaq_tickers_sorted = sorted(nasdaq_tickers)
         return nasdaq_tickers_sorted
