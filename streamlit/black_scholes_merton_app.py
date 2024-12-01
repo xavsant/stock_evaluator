@@ -11,6 +11,15 @@ from io import BytesIO
 # Initialise POST URL
 backend_url = environ["BACKEND_URL"]
 
+import yfinance as yf
+
+try:
+    ticker = "AAPL"
+    data = yf.download(ticker, period="1d")
+    st.write("Yahoo Finance API response:", data)
+except Exception as e:
+    st.error(f"Error accessing Yahoo Finance: {e}")
+
 def get_tickers():
     if "tickers" in st.session_state:
         return st.session_state.tickers
@@ -171,20 +180,15 @@ def sidebar():
                             ###### **option_price** 
                             The option price (also known as the premium) is the market price of an option. It represents the cost to purchase the option contract and is influenced by various factors such as the underlying asset price, strike price, time to expiration, implied volatility, and interest rates. It is typically calculated using the Black-Scholes-Merton (BSM) model, which is a widely used mathematical model for pricing European-style options.
                             
-                            **delta**
-                            Delta is a measure of the change in an option's price or premium resulting from a change in the underlying asset. It provides an estimate of how much the option price will move for a small change in the underlying asset's price. A delta of 0.5 means the option's price will increase by \$0.50 for every \$1 increase in the underlying asset.
+                            - **delta**: Measures the change in an option's price or premium resulting from a change in the underlying asset. It provides an estimate of how much the option price will move for a small change in the underlying asset's price. A delta of 0.5 means the option's price will increase by 0.50 for every 1 increase in the underlying asset.
                             
-                            **gamma**
-                            Gamma measures the rate of change of delta as the price of the underlying asset changes. It helps forecast how much the delta will change for a given change in the underlying asset's price. It also provides insights into the curvature of the option's price curve relative to the underlying asset, indicating the potential for larger price movements as the underlying asset fluctuates.
+                            - **gamma**: Measures the rate of change of delta as the price of the underlying asset changes. It helps forecast how much the delta will change for a given change in the underlying asset's price. It also provides insights into the curvature of the option's price curve relative to the underlying asset, indicating the potential for larger price movements as the underlying asset fluctuates.
                             
-                            **vega**
-                            Vega measures the risk of changes in implied volatility or the forward-looking expected volatility of the underlying asset price. As implied volatility increases, the price of options tends to rise, and vega quantifies how much the price of an option will change with a 1% change in implied volatility. This is especially important for options traders who anticipate volatility changes in the market.
+                            - **vega**: Measures the risk of changes in implied volatility or the forward-looking expected volatility of the underlying asset price. As implied volatility increases, the price of options tends to rise, and vega quantifies how much the price of an option will change with a 1% change in implied volatility. This is especially important for options traders who anticipate volatility changes in the market.
                             
-                            **theta**
-                            Theta measures time decay in the value of an option or its premium. It shows how much the value of an option decreases as time passes, all else being equal. A higher absolute theta indicates faster time decay, which is crucial for option holders and sellers to understand, especially as expiration dates approach.
+                            - **theta**: Measures time decay in the value of an option or its premium. It shows how much the value of an option decreases as time passes, all else being equal. A higher absolute theta indicates faster time decay, which is crucial for option holders and sellers to understand, especially as expiration dates approach.
                             
-                            **rho**
-                            Rho measures an option's sensitivity to changes in the risk-free rate of interest. It indicates how much the price of an option will increase or decrease in response to a 1% change in the risk-free interest rate. Rho is particularly relevant when considering economic conditions and central bank policy, as changes in interest rates can impact options pricing.
+                            - **rho**: Measures an option's sensitivity to changes in the risk-free rate of interest. It indicates how much the price of an option will increase or decrease in response to a 1% change in the risk-free interest rate. Rho is particularly relevant when considering economic conditions and central bank policy, as changes in interest rates can impact options pricing.
                             """)
 
             st.markdown("**Comparing Black-Scholes-Merton-Calculated Premium against User Input Premium**")
