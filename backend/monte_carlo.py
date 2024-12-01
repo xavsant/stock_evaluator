@@ -81,14 +81,17 @@ class MonteCarloSimulation:
         """Generates interactive average simulation plot using Plotly."""
         average_values = np.mean(self.sims_matrix, axis=1)
         days = list(range(len(average_values)))
+
         fig = go.Figure()
+
         fig.add_trace(go.Scatter(
             x=days,
             y=average_values,
             mode='lines+markers',
             name='Average Portfolio Value',
-            line=dict(color='blue'),
+            line=dict(color='#FFA500'),
         ))
+
         fig.add_annotation(
             x=days[-1],
             y=average_values[-1],
@@ -97,11 +100,14 @@ class MonteCarloSimulation:
             arrowhead=2,
             ax=-50, ay=-40
         )
+
         fig.update_layout(
             title="Average Simulated Portfolio Value",
             xaxis_title="Days",
             yaxis_title="Portfolio Value (USD)",
-            yaxis=dict(range=[self.sims_matrix.min() - 100, self.sims_matrix.max() + 100]),
+            # yaxis=dict(range=[self.sims_matrix.min() - 100, self.sims_matrix.max() + 100]),
+            yaxis = dict(autorange=True),
+            xaxis = dict(autorange=True),
             template="plotly_white"
         )
 
@@ -165,6 +171,7 @@ class MonteCarloSimulation:
         ))
         fig.add_vline(x=VaR_5, line=dict(color="red", dash="dash"))
         fig.add_vline(x=CVaR_5, line=dict(color="orange", dash="dash"))
+        
         fig.update_layout(
             title="Histogram of Final Portfolio Values with VaR and CVaR",
             xaxis_title="Final Portfolio Value",
@@ -178,11 +185,15 @@ class MonteCarloSimulation:
     def corr_heatmap(self):
         """Generates a static correlation heatmap as an image buffer with a transparent background and white text."""
         plt.figure(figsize=(8, 8))
+
+        # Set up custom diverging colormap (Green for positive, Red for negative)
+        cmap = sns.diverging_palette(10, 150, s=85, l=50, n=500, center="light")
+
         sns.heatmap(
             self.stock_data.corr_matrix,
             annot=True,
             fmt=".2f",
-            cmap="coolwarm",
+            cmap=cmap,
             square=True,
             xticklabels=self.stock_data.stocks,
             yticklabels=self.stock_data.stocks,
@@ -217,9 +228,9 @@ class MonteCarloSimulation:
         plt.close()
         buf.seek(0)
         return buf
-
+        
     def display_risk_metrics_table_with_insights(self):
-        # Calculate risk metrics
+    
         std_dev = np.std(self.final_values)
         mean_return = np.mean(self.final_values)
         sharpe_ratio = (mean_return - self.init_portfolio_value) / std_dev
@@ -240,33 +251,60 @@ class MonteCarloSimulation:
         else:
             insights.append("Low risk-adjusted returns; revisit strategy or rebalance.")
 
-        # Create the table for metrics
-        fig, ax = plt.subplots()
+        # Create the figure and axis with a black background
+        fig, ax = plt.subplots(figsize=(6,2))
+        fig.patch.set_facecolor('black')  # Set figure background to black
         ax.axis('tight')
         ax.axis('off')
+
+        # Table data
         table_data = [
             ["Metric", "Value"],
             ["Standard Deviation", f"${std_dev:.2f}"],
             ["Mean Final Value", f"${mean_return:.2f}"],
             ["Sharpe Ratio", f"{sharpe_ratio:.2f}"]
         ]
-        table = ax.table(cellText=table_data, colLabels=None, cellLoc='center', loc='center')
+
+        # Create the table
+        table = ax.table(cellText=table_data, colLabels=None, cellLoc='center', loc='top')
+
+        # Set table styles for inverted appearance
+        for (row, col), cell in table.get_celld().items():
+            cell.set_edgecolor('white')
+            if row == 0:  # Header row
+                cell.set_facecolor('#202020')
+                cell.set_text_props(color='white', weight='bold')
+            else:  # Data rows
+                cell.set_facecolor('none')
+                cell.set_text_props(color='white')
+
+        # Adjust font size and scaling
         table.auto_set_font_size(False)
-        table.set_fontsize(12)
+        table.set_fontsize(11)
         table.scale(1.5, 1.5)
-        plt.title("Risk Metrics Summary with Insights")
-        
-        # Add insights as annotations
+
+        # Add the insights as text below the table
         for i, insight in enumerate(insights, start=1):
-            plt.figtext(0.5, 0.1 - (i * 0.05), f"{i}. {insight}", wrap=True, horizontalalignment='center', fontsize=10)
+            plt.figtext(
+                0.5, 
+                0.80 - (i * 0.09),  # Positioning insights below the table
+                f"{i}. {insight}", 
+                wrap=True, 
+                horizontalalignment='center', 
+                fontsize=10, 
+                color='white'  # White text for insights
+            )
+
+        # Set the title with white text
+        # plt.title("Risk Metrics Summary with Insights", color='white')
 
         # Save to a buffer
         buf = BytesIO()
-        plt.savefig(buf, format='png', bbox_inches='tight', pad_inches=0.1)
+        plt.savefig(buf, format='png', bbox_inches='tight', pad_inches=0.1, transparent=True)
         plt.close()
         buf.seek(0)
         return buf
-    
+
     def _return_format(self, fig, return_as_json: bool):
         if return_as_json:
             return fig.to_json()  # Return as JSON string for API use

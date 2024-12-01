@@ -113,46 +113,6 @@ class BlackScholesMertonModel:
 
         return payoff
 
-    # def plot_payoff(self):
-    #     stock_prices = np.linspace(0, self.strike_price * 2, 500)
-        
-    #     # Calculate payoff
-    #     payoffs = self._calculate_payoff(stock_prices)
-        
-    #     # Separate gains and losses for coloring
-    #     losses = np.where(payoffs < 0, payoffs, np.nan)
-    #     gains = np.where(payoffs >= 0, payoffs, np.nan)
-        
-    #     # Plot the payoff graph
-    #     plt.figure(figsize=(10, 6))
-    #     plt.plot(stock_prices, losses, label="Losses", color='#FF4C4C', linewidth=3)  # Bright red
-    #     plt.plot(stock_prices, gains, label="Gains", color='#4CFF4C', linewidth=3)  # Bright green
-    #     plt.axhline(0, color='white', linewidth=1, linestyle='--')
-    #     plt.axvline(self.strike_price, color='white', linewidth=1, linestyle='--', label="Strike Price")
-    #     plt.xlabel("Stock Price at Expiry", color="white")
-    #     plt.ylabel("Profit / Loss", color="white")
-    #     plt.legend(facecolor="black", edgecolor="white", labelcolor="white")
-    #     plt.grid(visible=False)
-
-    #     # Customize text, ticks, and spines
-    #     ax = plt.gca()
-    #     ax.tick_params(colors="white")  # Tick colors
-    #     for spine in ax.spines.values():  # Axes lines
-    #         spine.set_color("white")
-    #     ax.set_facecolor('black')  # Black background for axes
-
-    #     # Set transparent figure background
-    #     fig = plt.gcf()
-    #     fig.patch.set_alpha(0)  # Transparent figure background
-
-    #     # Save to a buffer
-    #     buf = BytesIO()
-    #     plt.savefig(buf, format='png', bbox_inches='tight', pad_inches=0.1, facecolor=fig.get_facecolor())
-    #     plt.close()
-    #     buf.seek(0)
-    #     return buf
-
-
     def plot_payoff(self):
         # Define stock price range around the spot price for better focus
         stock_prices = np.linspace(self.spot_price * 0.8, self.spot_price * 1.2, 500)
@@ -203,27 +163,6 @@ class BlackScholesMertonModel:
         buf.seek(0)
         
         return buf
-
-        
-    # def plot_option_price(self, tr_type, op_pr):
-    #     op.single_plotter(spot=self.option_price(), strike=self.K, op_type=self.type_option, 
-    #                       tr_type=tr_type, op_pr=op_pr)
-        
-    #     # Save to a buffer
-    #     buf = BytesIO()
-    #     plt.savefig(buf, format='png', bbox_inches='tight', pad_inches=0.1)
-    #     plt.close()
-    #     buf.seek(0)
-    #     return buf
-        
-    # def _evaluate_fraction(self, value):
-    #     if isinstance(value, str): # if '/' included
-    #         try:
-    #             return eval(value)
-    #         except (SyntaxError, NameError):
-    #             raise ValueError(f"Invalid fraction: {value}")
-    #     return value
-
 
 if __name__ == "__main__":
     from PIL import Image

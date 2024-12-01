@@ -97,49 +97,115 @@ def evaluate_position(position: str):
 def sidebar():
     st.sidebar.title("Input Variables")
 
-    stock_data = stock_spot_and_volatility()
-    spot_price = st.sidebar.number_input("Spot Price:", min_value = 0.0, value = stock_data["spot_price"])
-    sigma = st.sidebar.number_input("Volatility:", min_value = 0.0, value = stock_data["volatility"])
+    # Initialize session state variables if they don't exist
+    if 'generated' not in st.session_state:
+        st.session_state.generated = False
+    if 'bsm_results' not in st.session_state:
+        st.session_state.bsm_results = None
+    if 'time' not in st.session_state:
+        st.session_state.time = 30
+    if 'premium' not in st.session_state:
+        st.session_state.premium = 5.0
+    if 'interest_rate' not in st.session_state:
+        st.session_state.interest_rate = 0.03
+    if 'position' not in st.session_state:
+        st.session_state.position = 'Buy (Long)'
+    if 'option_type' not in st.session_state:
+        st.session_state.option_type = 'Call (📈)'
 
-    strike_price = st.sidebar.number_input("Strike Price:", min_value = 0.0, value = stock_data["spot_price"])
-    time = st.sidebar.number_input("Time to Expiration (days):", min_value = 0, value = 30) # days
-    premium = st.sidebar.number_input("Option Premium:", min_value = 0.0, value = 5.0)
-    interest_rate = st.sidebar.number_input("Risk Free Interest Rate:", min_value = 0.01, value=0.03)
+    # Get real-time data from API
+    stock_data = stock_spot_and_volatility()
+    spot_price = stock_data["spot_price"]
+    sigma = stock_data["volatility"]
+    strike_price = stock_data["spot_price"] - 5  # Default strike price to spot price -5
     
-    position = st.sidebar.selectbox("Type of Position", options = ['Buy (Long)', 'Sell (Short)'])
-    option_type = st.sidebar.selectbox("Type of Option", options = ['Call (📈)', 'Put (📉)'])
+    # Display the API-fetched values
+    st.sidebar.number_input("Spot Price:", min_value=0.0, value=spot_price, disabled=True)
+    sigma = st.sidebar.number_input("Volatility:", min_value=0.0, value=sigma)
+    strike_price = st.sidebar.number_input("Strike Price:", min_value=0.0, value=strike_price)
+    
+    # Use session state for other inputs
+    time = st.sidebar.number_input("Time to Expiration (days):", min_value=0, key='time')
+    premium = st.sidebar.number_input("Option Premium:", min_value=0.0, key='premium')
+    interest_rate = st.sidebar.number_input("Risk Free Interest Rate:", min_value=0.01, key='interest_rate')
+    position = st.sidebar.selectbox("Type of Position", options=['Buy (Long)', 'Sell (Short)'], key='position')
+    option_type = st.sidebar.selectbox("Type of Option", options=['Call (📈)', 'Put (📉)'], key='option_type')
 
     # Evaluate to correct input
     position = evaluate_position(position)
     option_type = evaluate_option_type(option_type)
     
+    # Single generate button
     generate_button = st.sidebar.button("Generate")
 
     if generate_button:
-        black_scholes_merton_initialise_request(interest_rate, spot_price, strike_price, time, sigma, \
-                                   premium, position, option_type)
-        greeks = black_scholes_merton_get_greeks()
-        plot_payoffs = black_scholes_merton_plot_payoff()
-        value = compare_prices(greeks["payload"]["option_price"], premium)
+        black_scholes_merton_initialise_request(interest_rate, spot_price, strike_price, time, sigma,
+                                              premium, position, option_type)
         
-        st.markdown("**Greek Values**")
-        st.dataframe(greeks["payload"], use_container_width = True)
+        # Store all results in session state
+        st.session_state.bsm_results = {
+            'greeks': black_scholes_merton_get_greeks(),
+            'plot_payoffs': black_scholes_merton_plot_payoff(),
+            'position': position,
+            'option_type': option_type,
+            'premium': premium
+        }
+        st.session_state.generated = True
 
-        st.markdown(f"**{position.capitalize()} Payoff Diagram of a {option_type.capitalize()} Option**")
-        st.image(plot_payoffs)
+    # Display saved results if they exist
+    if st.session_state.generated and st.session_state.bsm_results:
+        results = st.session_state.bsm_results
+        
+        st.markdown(f"**{results['position'].capitalize()} Payoff Diagram of a {results['option_type'].capitalize()} Option**")
+        st.image(results['plot_payoffs'])
 
-        st.markdown("**Comparing Black-Scholes-Merton-Calculated Premium against User Input Premium**")
-        st.dataframe({"Theoretical Option Price": greeks["payload"]["option_price"], "Actual Option Price": premium}, use_container_width = True)
-        st.caption(f"The actual option price is {value}.")
+        with st.container(border=True):
+            st.markdown("**Greek Values**")
+            st.dataframe(results['greeks']["payload"], use_container_width=True)
+            with st.popover("Information on Greeks"):
+                st.markdown("""
+                            ###### **option_price** 
+                            The option price (also known as the premium) is the market price of an option. It represents the cost to purchase the option contract and is influenced by various factors such as the underlying asset price, strike price, time to expiration, implied volatility, and interest rates. It is typically calculated using the Black-Scholes-Merton (BSM) model, which is a widely used mathematical model for pricing European-style options.
+                            
+                            **delta**
+                            Delta is a measure of the change in an option's price or premium resulting from a change in the underlying asset. It provides an estimate of how much the option price will move for a small change in the underlying asset's price. A delta of 0.5 means the option's price will increase by \$0.50 for every \$1 increase in the underlying asset.
+                            
+                            **gamma**
+                            Gamma measures the rate of change of delta as the price of the underlying asset changes. It helps forecast how much the delta will change for a given change in the underlying asset's price. It also provides insights into the curvature of the option's price curve relative to the underlying asset, indicating the potential for larger price movements as the underlying asset fluctuates.
+                            
+                            **vega**
+                            Vega measures the risk of changes in implied volatility or the forward-looking expected volatility of the underlying asset price. As implied volatility increases, the price of options tends to rise, and vega quantifies how much the price of an option will change with a 1% change in implied volatility. This is especially important for options traders who anticipate volatility changes in the market.
+                            
+                            **theta**
+                            Theta measures time decay in the value of an option or its premium. It shows how much the value of an option decreases as time passes, all else being equal. A higher absolute theta indicates faster time decay, which is crucial for option holders and sellers to understand, especially as expiration dates approach.
+                            
+                            **rho**
+                            Rho measures an option's sensitivity to changes in the risk-free rate of interest. It indicates how much the price of an option will increase or decrease in response to a 1% change in the risk-free interest rate. Rho is particularly relevant when considering economic conditions and central bank policy, as changes in interest rates can impact options pricing.
+                            """)
+
+            st.markdown("**Comparing Black-Scholes-Merton-Calculated Premium against User Input Premium**")
+            value = compare_prices(results['greeks']["payload"]["option_price"], results['premium'])
+            st.dataframe({
+                "Theoretical Option Price": results['greeks']["payload"]["option_price"], 
+                "Actual Option Price": results['premium']
+            }, use_container_width=True)
+            st.text(f"The premium you've entered is {value}.")
 
 # Layout for the application
 def main():
     st.header("Black Scholes Merton for Stock Options")
     st.markdown("This function uses the Black Scholes Merton model to generate key insights for a chosen stock option.")
     st.caption("Select your variables in the column on the left.")
+    with st.popover("More information"):
+        st.markdown("""
+                    The Black-Scholes-Merton model is a mathematical formula used to calculate the theoretical price of options. It assumes that the price of the underlying asset follows a :blue[geometric Brownian motion and that there are no arbitrage opportunities].
+                    
+                    The model takes into account key factors such as the :red[stock price, strike price, risk-free interest rate, time to expiration, and volatility] to determine an option's price. 
+                    
+                    The application also asks for the :red[actual option premium, type of position and type of option] to determine the payoffs and whether the actual option price is under or overpriced as determined by the model.
+                    """)
     "---"
 
-    st.write("##### Output")
     sidebar()
     
 if __name__ == "__page__":

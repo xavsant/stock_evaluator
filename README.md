@@ -72,15 +72,11 @@ WIP.
     API Docs: [For interactively testing backend functions](http://0.0.0.0:8000/docs)
 
 #### [5] ToDo
-- Make BSM variable names more comprehensive
-- Extract current price from stock for BSM
 - Add error handling for incorrect input values in streamlit
-- Beautify BSM plot
-- Add caching for each frontend function
-- Fix Selenium and Docker issues
 - Update input and output hinting for class functions
 - Update dependencies in README
 - Add documentation to classes
 - Add comments to classes
 - Fix class names in __init__ 
 - Only use pickle for models, use JSON for dict
+- Extract descriptive information for pages from JSON (as opposed to hard-code)
