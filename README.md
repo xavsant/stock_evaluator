@@ -12,7 +12,7 @@ Index:
 Web Application for Portfolio Stock Evaluation using Monte Carlo Simulations, Black-Scholes-Merton Model for Stock Options, and Sentiment Analysis.
 
 #### [2] Structure
-
+```
 stock_evaluator/
 │
 ├── app.py                      # Streamlit app with options to select analysis and view results
@@ -30,12 +30,18 @@ stock_evaluator/
 │       ├── __init__.py            
 │       └── sentiment_model.py        
 │
+├── streamlit/                  # Streamlit pages
+│   ├── black_scholes_merton_app.py
+│   ├── monte_carlo_app.py
+│   └── sentiment_analysis_app.py  
+│
 ├── notebooks/
 │   └── ...                     # For feature experimentation
 ├── Dockerfile_frontend
 ├── Dockerfile_backend
 ├── requirements.txt            # Dependencies
-└── README.md                   # Documentation on how to set up and run the app
+└── README.md
+```
 
 #### [3] Dependencies
 
@@ -57,7 +63,7 @@ WIP.
 
 **Locally with Docker:**
 1. Run `docker build -t image_name -f Dockerfile_name .` in your command line
-2. Run `docker run --env-file .env -p 0.0.0.0:80:80 image_name` for backend, `docker run -p 8501:8501 image_name` for frontend in your command line
+2. Run `docker run -p 0.0.0.0:80:80 image_name` for backend, `docker run -p 8501:8501 image_name` for frontend in your command line
 3. Open up `0.0.0.0:80/docs` for backend, `0.0.0.0:8501` for frontend in your browser  
 ---
 ***Locally without Docker***
@@ -66,12 +72,11 @@ WIP.
     API Docs: [For interactively testing backend functions](http://0.0.0.0:8000/docs)
 
 #### [5] ToDo
-- Make BSM variable names more comprehensive
-- Extract current price from stock
-- Figure out BSM plot issues
-- Account for required tokenizer for sentiment analysis
+- Add error handling for incorrect input values in streamlit
 - Update input and output hinting for class functions
 - Update dependencies in README
 - Add documentation to classes
 - Add comments to classes
 - Fix class names in __init__ 
+- Only use pickle for models, use JSON for dict
+- Extract descriptive information for pages from JSON (as opposed to hard-code)

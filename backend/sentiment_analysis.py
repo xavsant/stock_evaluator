@@ -4,7 +4,7 @@ from backend.utils.data_fetching import WebScraper
 # Sentiment Analysis
 import nltk
 from nltk.util import ngrams
-import gensim
+# nltk.download('stopwords')
 import contractions
 import pickle
 
@@ -48,11 +48,8 @@ class Stock_SentimentAnalysis:
         self.sentiment_count = {'optimistic': 0, 'neutral': 0, 'pessimistic': 0}
 
     def run(self):
-        self.scraper.setup_driver()
-        self.scraper.accept_cookies()
         self.scraper.search_stock()
         self.scraper.scrape_articles()
-        self.scraper.close_driver()
 
         for (headline, article, hyperlink) in zip(self.scraper.headline_list, self.scraper.article_list, self.scraper.hyperlink_list):
             sentiment = self.analyzer.predict_sentiment(article)
