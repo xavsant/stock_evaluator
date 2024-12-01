@@ -6,9 +6,6 @@ from .sentiment_analysis import Stock_SentimentAnalysis
 # Import utility functions
 from .utils.data_fetching import WebScraper
 
-# Import models
-from .models.sentiment_model import SentimentModel
-
 # Expose imports so they are accessible directly from `backend`
 __all__ = [
     "MonteCarloSimulation",
