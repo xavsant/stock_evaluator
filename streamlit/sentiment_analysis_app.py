@@ -2,6 +2,12 @@
 import streamlit as st
 from requests import post as rpost
 
+def get_tickers():
+    if "tickers" in st.session_state:
+        return st.session_state.tickers
+    else:
+        st.warning("No tickers initialized. Please restart the app.")
+
 def sentiment_request(stock: str):
      header = {"Content-Type": "application/json"}
 
@@ -65,7 +71,7 @@ def display_response(sentiment_payload: dict):
 def sidebar():
     st.sidebar.title("Input Variables")
 
-    stock = st.sidebar.selectbox("Select Stock:", options = ['AAPL', 'TSLA', 'NVDA'],)
+    stock = st.sidebar.selectbox("Select Stock:", options = get_tickers(), index = 9)
     
     generate_button = st.sidebar.button("Generate")
 
@@ -77,11 +83,11 @@ def sidebar():
 def main():
     st.header("Sentiment Analysis")
     st.markdown("For a chosen stock, this function searches Yahoo Finance for the latest news and  \n  \
-                gets the latest sentiment (individual + overall) using a trained model.  \n  \
-                Select your variables in the column on the left.")
+                gets the latest sentiment (individual + overall) using a trained model.")
+    st.caption("Select your variables in the column on the left.")
     "---"
 
-    st.write("#### Output")
+    st.write("##### Output")
     sidebar()
     
 if __name__ == "__page__":

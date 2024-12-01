@@ -1,9 +1,10 @@
 # Imports
 import streamlit as st
+from backend.utils.data_fetching import Finnhub
 
-# Mock backend function
-def backend_function(page, variable):
-    return f"Data fetched for {page} with variable: {variable}"
+# Initialize session state for tickers
+if "tickers" not in st.session_state:
+    st.session_state.tickers = Finnhub.get_tickers()  # Fetch tickers once
 
 pages = {
     "Functions": [

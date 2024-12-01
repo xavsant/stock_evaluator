@@ -1,14 +1,19 @@
 # Web Scraping Imports
 from bs4 import BeautifulSoup
 
-# Fetching Stock Data Imports
+# Fetching Stock Data
 import yfinance as yf
 import datetime as dt
+import pandas as pd
+import requests
 
 # Utility
 import os
 import requests
 import pickle
+from dotenv import load_dotenv
+load_dotenv()
+from os import environ
 
 # Get directory of pickled models
 base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -65,16 +70,16 @@ class WebScraper:
             except: # for cases where an article is locked behind a paywall or diverts the user to another news website
                 self.hyperlink_list.remove(hyperlink)
 
-class StockData:
+class MonteCarlo_StockData:
     def __init__(self, stock_list, 
                  start_date=dt.datetime.now() - dt.timedelta(days=365), 
                  end_date=dt.datetime.now(), 
-                 num_each_stock = None): #number of each stocks as input
+                 num_each_stock = None):
         self.stocks = stock_list
         self.start = start_date
         self.end = end_date
-        # added self.mean_price to calculate self.values
-        self.mean_price, self.mean_returns, self.cov_matrix, self.corr_matrix = self._get_data() # re-structure
+
+        self.mean_price, self.mean_returns, self.cov_matrix, self.corr_matrix = self._fetch_data()
         self.stock_len = len(self.mean_returns)
 
         # if number of each stock is not inputted, default to 100 for each stock
@@ -89,20 +94,20 @@ class StockData:
         self.values, self.weights = self._find_weights()
         self.port_value = sum(self.values)
 
-    def get_key_data(self):
+    def get_key_data(self): # to rename
         output = {
             "stock": self.stocks,
             "mean_price_per_stock": self.mean_price,
             "mean_return_per_stock": self.mean_returns,
             "shares_per_stock": self.num_each_stock,
-            "portfolio_weight": self.weights,
             "value_per_stock": self.values,
+            "portfolio_weight": self.weights,
             "portfolio_value": self.port_value
         }
 
         return output
 
-    def _get_data(self):
+    def _fetch_data(self):
         df = yf.download(self.stocks, self.start, self.end)
         # print(df)
         df_close = df["Close"]
@@ -112,10 +117,70 @@ class StockData:
         mean_returns = returns.mean()
         cov_matrix = returns.cov()
         corr_matrix = returns.corr()
-        return mean_price, mean_returns, cov_matrix, corr_matrix 
+        return list(mean_price), list(mean_returns), cov_matrix, corr_matrix 
 
     #calculate weights based on number of each stock and each stock's mean prices
     def _find_weights(self):
         values = [num * value for num, value in zip(self.num_each_stock, self.mean_price)]
         weights = [value / sum(values) for value in values] 
         return values, weights
+
+class Black_Scholes_Merton_StockData:
+    def __init__(self, ticker):
+        self.ticker = ticker
+        self.stock = yf.Ticker(ticker)
+
+    def _get_spot_price(self):
+        """Fetches the current spot price of the stock."""
+        try:
+            data = self.stock.history(period="1d")
+            spot_price = data['Close'].iloc[-1]  # Get the latest closing price
+            return spot_price
+        except Exception as e:
+            raise ValueError(f"Error retrieving spot price for {self.ticker}: {e}")
+
+    def _get_volatility(self, period="6mo"):
+        """Calculates annualised volatility based on historical price data."""
+        try:
+            data = self.stock.history(period=period)
+            daily_returns = data['Close'].pct_change().dropna()
+            daily_volatility = daily_returns.std()
+            annualized_volatility = daily_volatility * (126 ** 0.5)
+            return annualized_volatility
+        except Exception as e:
+            raise ValueError(f"Error retrieving volatility for {self.ticker}: {e}")
+
+    def get_spot_and_volatility(self, period="6mo"):
+        """Returns both spot price and volatility."""
+        spot_price = self._get_spot_price()
+        volatility = self._get_volatility(period)
+        return {"spot_price": spot_price, "volatility": volatility}
+
+    
+class Finnhub:
+    @staticmethod
+    def get_tickers():
+        # API Call
+        finnhub_api_key = environ["FINNHUB_API_KEY"]
+
+        url = f"https://finnhub.io/api/v1/stock/symbol?exchange=US&token={finnhub_api_key}"
+        response = requests.get(url)
+        tickers = response.json()
+
+        # Filter for NASDAQ tickers and collect symbol and company name
+        nasdaq_tickers = [
+            ticker["symbol"]
+            for ticker in tickers
+            if ticker["mic"] == "XNAS"
+        ]
+
+        # nasdaq_tickers = [
+        #     {"Symbol": ticker["symbol"], "Company Name": ticker["description"]}
+        #     for ticker in tickers
+        #     if ticker["mic"] == "XNAS"
+        # ]
+
+        # nasdaq_tickers_sorted = sorted(nasdaq_tickers, key=lambda x: x["Symbol"])
+
+        nasdaq_tickers_sorted = sorted(nasdaq_tickers)
+        return nasdaq_tickers_sorted

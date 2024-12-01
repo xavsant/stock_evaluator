@@ -104,43 +104,106 @@ class BlackScholesMertonModel:
     
     def _calculate_payoff(self, stock_prices):
         if self.option_type in ("c", "call"):
-            payoffs = np.maximum(stock_prices - self.strike_price, 0) - self.premium
+            payoff = np.maximum(stock_prices - self.strike_price, 0) - self.premium
         elif self.option_type in ("p", "put"):
-            payoffs = np.maximum(stock_prices - self.spot_price, 0) - self.premium
+            payoff = np.maximum(stock_prices - self.spot_price, 0) - self.premium
 
         if self.position in ("s", "seller"):
-            payoffs = -payoffs
+            payoff = - payoff
 
-        return payoffs
+        return payoff
 
-    def visualize(self):
-        stock_prices = np.linspace(0, self.strike_price * 2, 500)
+    # def plot_payoff(self):
+    #     stock_prices = np.linspace(0, self.strike_price * 2, 500)
         
-        # Calculate payoff
-        payoffs = self._calculate_payoff(stock_prices)
+    #     # Calculate payoff
+    #     payoffs = self._calculate_payoff(stock_prices)
         
-        # Separate gains and losses for coloring
-        losses = np.where(payoffs < 0, payoffs, np.nan)
-        gains = np.where(payoffs >= 0, payoffs, np.nan)
+    #     # Separate gains and losses for coloring
+    #     losses = np.where(payoffs < 0, payoffs, np.nan)
+    #     gains = np.where(payoffs >= 0, payoffs, np.nan)
         
-        # Plot the payoff graph
-        plt.figure(figsize=(10, 6))
-        plt.plot(stock_prices, losses, label="Losses", color='red', linewidth=2)
-        plt.plot(stock_prices, gains, label="Gains", color='green', linewidth=2)
-        plt.axhline(0, color='black', linewidth=0.8, linestyle='--')
-        plt.axvline(self.strike_price, color='blue', linewidth=0.8, linestyle='--', label="Strike Price")
-        plt.title(f"{self.position.capitalize()} Payoff Diagram of a {self.option_type.capitalize()} Option")
-        plt.xlabel("Stock Price at Expiry")
-        plt.ylabel("Profit / Loss")
-        plt.legend()
-        plt.grid(visible=False)
+    #     # Plot the payoff graph
+    #     plt.figure(figsize=(10, 6))
+    #     plt.plot(stock_prices, losses, label="Losses", color='#FF4C4C', linewidth=3)  # Bright red
+    #     plt.plot(stock_prices, gains, label="Gains", color='#4CFF4C', linewidth=3)  # Bright green
+    #     plt.axhline(0, color='white', linewidth=1, linestyle='--')
+    #     plt.axvline(self.strike_price, color='white', linewidth=1, linestyle='--', label="Strike Price")
+    #     plt.xlabel("Stock Price at Expiry", color="white")
+    #     plt.ylabel("Profit / Loss", color="white")
+    #     plt.legend(facecolor="black", edgecolor="white", labelcolor="white")
+    #     plt.grid(visible=False)
 
-        # Save to a buffer
+    #     # Customize text, ticks, and spines
+    #     ax = plt.gca()
+    #     ax.tick_params(colors="white")  # Tick colors
+    #     for spine in ax.spines.values():  # Axes lines
+    #         spine.set_color("white")
+    #     ax.set_facecolor('black')  # Black background for axes
+
+    #     # Set transparent figure background
+    #     fig = plt.gcf()
+    #     fig.patch.set_alpha(0)  # Transparent figure background
+
+    #     # Save to a buffer
+    #     buf = BytesIO()
+    #     plt.savefig(buf, format='png', bbox_inches='tight', pad_inches=0.1, facecolor=fig.get_facecolor())
+    #     plt.close()
+    #     buf.seek(0)
+    #     return buf
+
+
+    def plot_payoff(self):
+        # Define stock price range around the spot price for better focus
+        stock_prices = np.linspace(self.spot_price * 0.8, self.spot_price * 1.2, 500)
+        
+        # Calculate payoffs
+        try:
+            payoffs = self._calculate_payoff(stock_prices)
+        except Exception as e:
+            raise ValueError(f"Error in calculating payoffs: {e}")
+
+        # Identify gains and losses
+        losses = np.minimum(payoffs, 0)
+        gains = np.maximum(payoffs, 0)
+        
+        # Plot setup
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.fill_between(stock_prices, 0, losses, color='red', alpha=0.2, label="Loss Area")
+        ax.fill_between(stock_prices, 0, gains, color='green', alpha=0.2, label="Gain Area")
+        ax.plot(stock_prices, payoffs, color='blue', linewidth=1.7)
+        ax.axhline(0, color='black', linewidth=1, linestyle='--', label="Break-even Line")
+        ax.axvline(self.strike_price, color='red', linewidth=1, linestyle='--', label="Strike Price")
+        ax.axvline(self.spot_price, color='blue', linewidth=1, linestyle='--', label="Spot Price")
+
+        # Labels and legend
+        ax.set_xlabel("Stock Price at Expiry", fontsize=12)
+        ax.set_ylabel("Profit / Loss", fontsize=12)
+        ax.legend(facecolor="white", edgecolor="grey", labelcolor="black", loc="best")
+
+        # Change the label colors
+        ax.xaxis.label.set_color("white")  # Change X-axis label color
+        ax.yaxis.label.set_color("white")  # Change Y-axis label color
+
+        # Customize text, ticks, and spines
+        ax = plt.gca()
+        ax.tick_params(colors="white")  # Tick colors
+        for spine in ax.spines.values():  # Axes lines
+            spine.set_color("white")
+        ax.set_facecolor("white")  # Black background for axes
+
+        # Set transparent figure background
+        fig = plt.gcf()
+        fig.patch.set_alpha(0)  # Transparent figure background
+
+        # Save the plot to a buffer
         buf = BytesIO()
         plt.savefig(buf, format='png', bbox_inches='tight', pad_inches=0.1)
-        plt.close()
+        plt.close(fig)
         buf.seek(0)
+        
         return buf
+
         
     # def plot_option_price(self, tr_type, op_pr):
     #     op.single_plotter(spot=self.option_price(), strike=self.K, op_type=self.type_option, 
@@ -165,20 +228,16 @@ class BlackScholesMertonModel:
 if __name__ == "__main__":
     from PIL import Image
 
-    bs_model = BlackScholesMertonModel(interest_rate=0.02, spot_price=90.83, strike_price=40.0, time=441, sigma=0.2046, \
+    bs_model = BlackScholesMertonModel(interest_rate=0.02, spot_price=90.83, strike_price=85.0, time=441, sigma=0.2046, \
                                        premium= 12.5, position="b", option_type="c")
     
-    print("Option Price:", bs_model.option_price()) # theoretical
-    print("Delta:", bs_model.delta())
-    print("Gamma:", bs_model.gamma())
-    print("Vega:", bs_model.vega())
-    print("Theta:", bs_model.theta())
-    print("Rho:", bs_model.rho())
+    greeks = bs_model.greeks()
+    print(greeks)
 
     # bs_model.plot_option_price(tr_type="b", op_pr = 12.5)
 
     # Read and display using matplotlib
-    options_payoffs_plot = bs_model.visualize()
+    options_payoffs_plot = bs_model.plot_payoff()
     options_payoffs_plot_image = Image.open(options_payoffs_plot)
     plt.imshow(options_payoffs_plot_image)
     plt.axis("off")

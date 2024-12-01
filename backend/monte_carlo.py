@@ -9,11 +9,11 @@ import plotly.graph_objects as go
 from io import BytesIO
 
 # Fetch Stock Data (for demo purposes + type hinting)
-from backend.utils.data_fetching import StockData
+from backend.utils.data_fetching import MonteCarlo_StockData
 
 class MonteCarloSimulation:
-    def __init__(self, stock_data: StockData, forecast_timeframe=30, num_simulations=100, init_portfolio_value = None):
-        if not isinstance(stock_data, StockData):
+    def __init__(self, stock_data: MonteCarlo_StockData, forecast_timeframe=30, num_simulations=100, init_portfolio_value = None):
+        if not isinstance(stock_data, MonteCarlo_StockData):
             raise TypeError("Expected an instance of the StockData class.")
         self.stock_data = stock_data
         self.stock_len = self.stock_data.stock_len
@@ -195,7 +195,7 @@ class MonteCarloSimulation:
         )
 
         # Customize text and background
-        plt.title("Stock Correlation Matrix", color="white")
+        # plt.title("Stock Correlation Matrix", color="white")
         plt.xticks(color="white")
         plt.yticks(color="white")
 
@@ -283,7 +283,7 @@ if __name__ == "__main__":
     # Initialize the StockData class
     stock_symbols = ['AAPL', 'MSFT', 'GOOG']  # Replace with any valid stock symbols
     start_date = datetime.now() - timedelta(days=365)  # Data from the last year
-    stock_data = StockData(stock_list=stock_symbols, start_date=start_date)
+    stock_data = MonteCarlo_StockData(stock_list=stock_symbols, start_date=start_date)
 
     # Print the data to verify it works
     print("Mean Prices:", stock_data.mean_price) 

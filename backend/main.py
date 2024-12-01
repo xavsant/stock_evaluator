@@ -9,7 +9,7 @@ from backend.black_scholes_merton import BlackScholesMertonModel
 from backend.monte_carlo import MonteCarloSimulation
 
 # Utility
-from backend.utils.data_fetching import StockData
+from backend.utils.data_fetching import MonteCarlo_StockData
 from pydantic import BaseModel
 from typing import List
 from datetime import datetime, timedelta
@@ -35,13 +35,13 @@ monte_carlo_instance = None
 
 class BlackScholesMertonRequest(BaseModel):
     interest_rate: float = 0.02
-    spot_price: float = 10
-    strike_price: float = 15
-    time: int = 548
-    sigma: float = 0.2
+    spot_price: float = 90.83
+    strike_price: float = 85.0
+    time: int = 441
+    sigma: float = 0.2046
     option_type: str = "c"
     position: str = "b"
-    premium: float = 2
+    premium: float = 12.5
 
 class StockSymbolsRequest(BaseModel):
     stock_symbols: List[str] = ["AAPL", "TSLA", "AMZN"]
@@ -72,9 +72,9 @@ async def initialise_black_scholes_merton(request: BlackScholesMertonRequest):
         strike_price=request.strike_price, 
         time=request.time, 
         sigma=request.sigma, 
-        option_type=request.option_type,
+        premium=request.premium,
         position=request.position,
-        premium=request.premium
+        option_type=request.option_type
         )
     
     return {"message": "Black Scholes Merton model initialised successfully."}
@@ -85,7 +85,7 @@ async def initialise_monte_carlo(request: StockSymbolsRequest):
     
     # Initialise or reinitialise the MonteCarloSimulation instance
     start_date = datetime.now() - timedelta(days=request.historical_timeframe)
-    stock_data = StockData(stock_list=request.stock_symbols, start_date=start_date, num_each_stock=request.num_each_stock)
+    stock_data = MonteCarlo_StockData(stock_list=request.stock_symbols, start_date=start_date, num_each_stock=request.num_each_stock)
     monte_carlo_instance = MonteCarloSimulation(
         stock_data=stock_data,
         num_simulations=request.num_simulations,
@@ -109,7 +109,7 @@ async def stock_sentiment_analysis(stock: str) -> dict:
 # ---
 # Black Scholes Merton Options
 # ---
-@app.post("/black_scholes_merton_option/greeks")
+@app.post("/black_scholes_merton_option/get_greeks")
 async def black_scholes_merton_option() -> dict:
     if black_scholes_merton_instance is None:
         raise HTTPException(status_code=500, detail="Black Scholes Merton model instance not initialised.")
@@ -120,12 +120,12 @@ async def black_scholes_merton_option() -> dict:
     except TypeError as e:
         return {"success": False, "error": str(e)}
 
-@app.post("/black_scholes_merton_option/plot")
+@app.post("/black_scholes_merton_option/plot_payoff")
 async def black_scholes_merton_option():
     if black_scholes_merton_instance is None:
         raise HTTPException(status_code=500, detail="Black Scholes Merton model instance not initialised.")
 
-    img_buf = black_scholes_merton_instance.visualize()
+    img_buf = black_scholes_merton_instance.plot_payoff()
     return StreamingResponse(img_buf, media_type="image/png")
 
 # ---
