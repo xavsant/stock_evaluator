@@ -121,8 +121,8 @@ def monte_carlo_generate_risk_metrics() -> PIL_Image:
     return response_image
 
 def show_explanatory_text():
-    st.header("Monte Carlo Simulation")
-    st.markdown("This function generates results for a Monte Carlo Simulation of a chosen portfolio of stock.")
+    st.header("Monte Carlo Simulations")
+    st.markdown("This function generates results for Monte Carlo simulations of a chosen portfolio of stock.")
     st.caption("Select your variables in the column on the left.")
     with st.popover("More information"):
         st.markdown("""

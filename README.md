@@ -105,6 +105,7 @@ For the end-state, imports of modules within the project are done using absolute
 - Fix web scraper inconsistency issues
 - Fix streamlit web app issue with Black_Scholes_Merton_StockData class (works properly after restart)
 - Fix caching issue with explanatory text on Monte Carlo page
+- Clean up streamlit pages by moving functions to another .py
 - Edit increments for streamlit user inputs
 - Edit WebScraper class to behave in a more OOP way, returning objects
 - Only use pickle for models, use JSON for dict
