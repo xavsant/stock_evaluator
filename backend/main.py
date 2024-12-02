@@ -67,7 +67,7 @@ async def initialise_black_scholes_merton(request: BlackScholesMertonRequest):
     global black_scholes_merton_instance
     
     black_scholes_merton_instance = BlackScholesMertonModel(
-        interest_rate=request.interest_rate, 
+        risk_free_interest_rate=request.interest_rate, 
         spot_price=request.spot_price, 
         strike_price=request.strike_price, 
         time=request.time, 

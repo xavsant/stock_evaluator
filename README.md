@@ -9,7 +9,9 @@ Index:
 
 #### [1] Description
 
-Web Application for Portfolio Stock Evaluation using Monte Carlo simulations, Black-Scholes-Merton model for Stock Options, and Sentiment Analysis.
+Web Application for Portfolio Stock Evaluation using Monte Carlo simulations, Black-Scholes-Merton model for Stock Options, and Sentiment Analysis. Provides a comprehensive overview of a chosen stock/portfolio based on gaussian simulations, theoretical option premium calculations and article reviews.
+
+![Web Application](./notebooks/screenshots/MonteCarlo_screenshot.png)
 
 #### [2] Structure
 ```
@@ -99,8 +101,11 @@ For the end-state, imports of modules within the project are done using absolute
     API Docs: [For interactively testing backend functions](http://0.0.0.0:8000/docs)
 
 #### [5] ToDo
-- Fix web scraper inconsistency issues
 - Add error handling for incorrect input values in streamlit
+- Fix web scraper inconsistency issues
+- Fix streamlit web app issue with Black_Scholes_Merton_StockData class (works properly after restart)
+- Fix caching issue with explanatory text on Monte Carlo page
+- Edit increments for streamlit user inputs
+- Edit WebScraper class to behave in a more OOP way, returning objects
 - Only use pickle for models, use JSON for dict
-- Extract descriptive information for pages from JSON (as opposed to hard-code)
-- Edit WebScraper class to behave in a more OOP way
+- Input descriptive information for streamlit pages from JSON as opposed to hard-code markdown
