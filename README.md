@@ -83,8 +83,9 @@ If any packages/dependencies are updated via poetry, be sure to export the requi
 For the end-state, imports of modules within the project are done using absolute filepaths. This is because of the nature of fastapi. To run specific files in isolation you will have to edit the imports (i.e. from backend.utils.data_fetching import WebScraper becomes from utils import Webscraper).
 
 **Live version:**
-[Frontend](https://stock-evaluator-30590.streamlit.app)
-[Interactive Backend](https://stock-evaluator-djr5.onrender.com/docs)
+- [Frontend](https://stock-evaluator-30590.streamlit.app)
+- [Interactive Backend](https://stock-evaluator-djr5.onrender.com/docs)
+
 *Note: Your IP may need to be given access to use the live versions*
 
 **Backend Locally with Docker:**
