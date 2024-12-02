@@ -90,7 +90,7 @@ def sidebar():
             st.session_state.selected_stock = stock
 
         else:
-            st.error(f"The web scraper encountered difficulties accessing {stock}, please visit https://finance.yahoo.com/quote/{stock}/ instead.")
+            st.error(f"The web scraper encountered difficulties accessing {stock},  \n  please visit https://finance.yahoo.com/quote/{stock}/ directly instead.")
 
     # Display saved results if they exist
     if st.session_state.generated and st.session_state.sentiment_results:
