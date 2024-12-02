@@ -11,6 +11,7 @@ from io import BytesIO
 # Initialise POST URL
 backend_url = environ["BACKEND_URL"]
 
+# Validation Check for Yahoo Finance
 import yfinance as yf
 
 try:
@@ -129,7 +130,7 @@ def sidebar():
     stock_data = stock_spot_and_volatility()
     spot_price = stock_data["spot_price"]
     sigma = stock_data["volatility"]
-    strike_price = stock_data["spot_price"] - 5  # Default strike price to spot price -5
+    strike_price = max(stock_data["spot_price"] - 5, 0.0)  # Default strike price to spot price -5
     
     # Display the API-fetched values
     st.sidebar.number_input("Spot Price:", min_value=0.0, value=spot_price, disabled=True)
