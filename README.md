@@ -17,8 +17,14 @@ Web Application for Portfolio Stock Evaluation using Monte Carlo simulations, Bl
 
 The backend of this project is hosted on Render, and the frontend on Streamlit. Finnhub's API is used to access NASDAQ tickers.
 
+#### **Functions**
+- Monte Carlo Simulations
 ![Web Application](./notebooks/screenshots/Monte_Carlo_Simulations_screenshot.png)
+
+- Black-Scholes-Merton
 ![Web Application](./notebooks/screenshots/Black_Scholes_Merton_screenshot.png)
+
+- Sentiment Analysis
 ![Web Application](./notebooks/screenshots/Sentiment_Analysis_screenshot.png)
 
 ---
@@ -28,6 +34,11 @@ The backend of this project is hosted on Render, and the frontend on Streamlit. 
 stock_evaluator/
 │
 ├── app.py                              # Streamlit app
+│
+├── streamlit/                          # Streamlit pages
+│   ├── black_scholes_merton_app.py
+│   ├── monte_carlo_app.py
+│   └── sentiment_analysis_app.py 
 │
 ├── backend/
 │   ├── __init__.pys
@@ -41,12 +52,7 @@ stock_evaluator/
 │   └── models/     
 │       ├── __init__.py            
 │       └── maxent_sentiment_classifier.pkl
-│       └── ...        
-│
-├── streamlit/                          # Streamlit pages
-│   ├── black_scholes_merton_app.py
-│   ├── monte_carlo_app.py
-│   └── sentiment_analysis_app.py  
+│       └── ...         
 │
 ├── notebooks/
 │   └── ...                             # For feature experimentation
