@@ -9,7 +9,7 @@ Index:
 
 #### [1] Description
 
-Web Application for Portfolio Stock Evaluation using Monte Carlo Simulations, Black-Scholes-Merton Model for Stock Options, and Sentiment Analysis.
+Web Application for Portfolio Stock Evaluation using Monte Carlo simulations, Black-Scholes-Merton model for Stock Options, and Sentiment Analysis.
 
 #### [2] Structure
 ```
@@ -37,7 +37,7 @@ stock_evaluator/
 │
 ├── notebooks/
 │   └── ...                     # For feature experimentation
-├── Dockerfile_frontend
+│
 ├── Dockerfile_backend
 ├── requirements.txt            # Dependencies
 └── README.md
@@ -45,10 +45,35 @@ stock_evaluator/
 
 #### [3] Dependencies
 
+**Python**
 - python = "^3.11"
+
+**General Packages**
+- [numpy](https://pypi.org/project/numpy/)
 - [pandas](https://pypi.org/project/pandas/)
-- [streamlit](https://pypi.org/project/streamlit/)
+- [yfinance](https://pypi.org/project/yfinance/)
+
+**Interface**
 - [fastapi](https://pypi.org/project/fastapi/)
+- [streamlit](https://pypi.org/project/streamlit/)
+
+**Function-Exclusive Packages**
+*Black Scholes Merton*
+- [scipy](https://pypi.org/project/scipy/)
+
+*Sentiment Analysis*
+- [beautifulsoup4](https://pypi.org/project/beautifulsoup4/)
+- [contractions](https://pypi.org/project/contractions/)
+- [gensim](https://pypi.org/project/gensim/)
+- [nltk](https://pypi.org/project/nltk)
+
+**Plotting**
+- [matplotlib](https://pypi.org/project/matplotlib/)
+- [plotly](https://pypi.org/project/plotly/)
+- [seaborn](https://pypi.org/project/seaborn/)
+
+*Refer to requirements.txt for more information on dependencies*
+
 
 #### [4] Running the project
 
@@ -58,13 +83,14 @@ If any packages/dependencies are updated via poetry, be sure to export the requi
 For the end-state, imports of modules within the project are done using absolute filepaths. This is because of the nature of fastapi. To run specific files in isolation you will have to edit the imports (i.e. from backend.utils.data_fetching import WebScraper becomes from utils import Webscraper).
 
 **Live version:**
-WIP.
-*Note: Ensure your IP has been given access to use the live versions*
+[Frontend](https://stock-evaluator-30590.streamlit.app)
+[Interactive Backend](https://stock-evaluator-djr5.onrender.com/docs)
+*Note: Your IP may need to be given access to use the live versions*
 
-**Locally with Docker:**
-1. Run `docker build -t image_name -f Dockerfile_name .` in your command line
-2. Run `docker run -p 0.0.0.0:80:80 image_name` for backend, `docker run -p 8501:8501 image_name` for frontend in your command line
-3. Open up `0.0.0.0:80/docs` for backend, `0.0.0.0:8501` for frontend in your browser  
+**Backend Locally with Docker:**
+1. Run `docker build -t image_name -f Dockerfile_backend .` in your command line
+2. Run `docker run -p 0.0.0.0:80:80 image_name`
+3. Open up `0.0.0.0:80/docs`
 ---
 ***Locally without Docker***
 1. Frontend: Run `streamlit run app.py` in your command line
@@ -73,10 +99,6 @@ WIP.
 
 #### [5] ToDo
 - Add error handling for incorrect input values in streamlit
-- Update input and output hinting for class functions
-- Update dependencies in README
-- Add documentation to classes
-- Add comments to classes
-- Fix class names in __init__ 
 - Only use pickle for models, use JSON for dict
 - Extract descriptive information for pages from JSON (as opposed to hard-code)
+- Edit WebScraper class to behave in a more OOP way

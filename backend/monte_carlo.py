@@ -6,31 +6,52 @@ import plotly.colors
 import plotly.graph_objects as go
 
 # Utility
+from backend.utils.data_fetching import MonteCarlo_StockData # demo + type hint
+from typing import Union, Tuple
+from matplotlib.figure import Figure
 from io import BytesIO
 
-# Fetch Stock Data (for demo purposes + type hinting)
-from backend.utils.data_fetching import MonteCarlo_StockData
-
 class MonteCarloSimulation:
-    def __init__(self, stock_data: MonteCarlo_StockData, forecast_timeframe=30, num_simulations=100, init_portfolio_value = None):
+    """
+    Performs Monte Carlo simulations of a given stock portfolio, generating key data and plots.
+
+    Inputs:
+        stock_data (MonteCarlo_StockData): Financial information of stocks of a portfolio.
+        forecast_timeframe (int): How many days into the future to forecast.
+        num_simulations (int): Number of Monte Carlo simulations to run.
+        init_portfolio_value (None|int|float): The initial portfolio value. If input == None, value is determined through stock_data outputs.
+    
+    Methods:
+        get_key_data: Returns key financial information from stock_data input.
+        plot_simulation_lines: Plots all the simulations performed.
+        plot_simulation_avg: Plots the average line, based on all the simulations performed.
+        plot_individual_prices: Plots the individual change in prices of stocks on a graph.
+        plot_individual_cumulative_returns: Plots the individual change in returns (%) of stocks on a graph.
+        plot_histogram_with_risk_metrics: Plots the histogram of simulations with the Value at Risk (VaR) and Conditional Value at Risk (CVaR) values.
+        corr_heatmap: Plots the correlation matrix of stocks.
+        display_risk_metrics_table_with_insights: Plots the standard deviation, mean final value and sharpe ratio along with an assessment of the risk of the portfolio.
+    """
+    def __init__(self, stock_data: MonteCarlo_StockData, forecast_timeframe: int = 30, num_simulations: int = 100, init_portfolio_value: Union[None, int, float] = None):
         if not isinstance(stock_data, MonteCarlo_StockData):
             raise TypeError("Expected an instance of the StockData class.")
         self.stock_data = stock_data
         self.stock_len = self.stock_data.stock_len
         self.num_sim = num_simulations
         self.time = forecast_timeframe
-        #initial portfolio value defaults to portfolio fetched by StockData class but can also be adjusted by user
+
+        # Defaults to portfolio fetched by StockData class but can also be adjusted by user
         if init_portfolio_value is not None:
               self.init_portfolio_value = init_portfolio_value
         else:
             self.init_portfolio_value = sum(self.stock_data.values)
+
         self.stock_sims_matrix, self.sims_matrix = self._create_simulation_matrix()
         self.final_values = self.sims_matrix[-1]
 
-    def get_key_data(self):
+    def get_key_data(self) -> dict:
         return self.stock_data.get_key_data()
 
-    def _create_simulation_matrix(self):
+    def _create_simulation_matrix(self) -> Tuple[np.ndarray, np.ndarray]:
         mean_matrix = np.full(shape=(self.time, self.stock_len), fill_value=self.stock_data.mean_returns).T
         
         #store simulated performance of individual stock
@@ -49,9 +70,10 @@ class MonteCarloSimulation:
             stock_sims_matrix[:, m, :] = stock_prices.T
             
             sims_matrix[:, m] = np.cumprod(np.inner(self.stock_data.weights, daily_returns.T) + 1) * self.init_portfolio_value
+
         return stock_sims_matrix, sims_matrix
     
-    def plot_simulation_lines(self, return_as_json: bool = True):
+    def plot_simulation_lines(self, return_as_json: bool = True) -> Union[str, Figure]:
         """Generates interactive simulation lines using Plotly."""
         days = list(range(self.sims_matrix.shape[0]))
         fig = go.Figure()
@@ -77,7 +99,7 @@ class MonteCarloSimulation:
         formatted_fig = self._return_format(fig, return_as_json = return_as_json)
         return formatted_fig
 
-    def plot_simulation_avg(self, return_as_json: bool = True):
+    def plot_simulation_avg(self, return_as_json: bool = True) -> Union[str, Figure]:
         """Generates interactive average simulation plot using Plotly."""
         average_values = np.mean(self.sims_matrix, axis=1)
         days = list(range(len(average_values)))
@@ -114,7 +136,7 @@ class MonteCarloSimulation:
         formatted_fig = self._return_format(fig, return_as_json = return_as_json)
         return formatted_fig
     
-    def plot_individual_prices(self, return_as_json: bool = True):
+    def plot_individual_prices(self, return_as_json: bool = True) -> Union[str, Figure]:
         days = list(range(self.stock_sims_matrix.shape[0]))  # Time steps (days)
         fig = go.Figure()
         for index, stock in enumerate(self.stock_data.stocks):
@@ -137,7 +159,7 @@ class MonteCarloSimulation:
         formatted_fig = self._return_format(fig, return_as_json=return_as_json)
         return formatted_fig
 
-    def plot_individual_cumulative_returns(self, return_as_json: bool = True):
+    def plot_individual_cumulative_returns(self, return_as_json: bool = True) -> Union[str, Figure]:
         days = list(range(self.stock_sims_matrix.shape[0]))  # Time steps (days)
         fig = go.Figure()
         for index, stock in enumerate(self.stock_data.stocks):
@@ -153,13 +175,13 @@ class MonteCarloSimulation:
         fig.update_layout(
             title="Average Simulated Performance of Individual Stocks (Returns)",
             xaxis_title="Days",
-            yaxis_title="Cumulative Returns",
+            yaxis_title="Cumulative Returns (%)",
             template="plotly_white"
         )
         formatted_fig = self._return_format(fig, return_as_json=return_as_json)
         return formatted_fig
 
-    def plot_histogram_with_risk_metrics(self, return_as_json: bool = True):
+    def plot_histogram_with_risk_metrics(self, return_as_json: bool = True) -> Union[str, Figure]:
         """Generates histogram with VaR and CVaR using Plotly."""
         VaR_5 = np.percentile(self.final_values, 5)
         CVaR_5 = self.final_values[self.final_values <= VaR_5].mean()
@@ -182,7 +204,7 @@ class MonteCarloSimulation:
         formatted_fig = self._return_format(fig, return_as_json = return_as_json)
         return formatted_fig
     
-    def corr_heatmap(self):
+    def corr_heatmap(self) -> BytesIO:
         """Generates a static correlation heatmap as an image buffer with a transparent background and white text."""
         plt.figure(figsize=(8, 8))
 
@@ -229,7 +251,7 @@ class MonteCarloSimulation:
         buf.seek(0)
         return buf
         
-    def display_risk_metrics_table_with_insights(self):
+    def display_risk_metrics_table_with_insights(self) -> BytesIO:
     
         std_dev = np.std(self.final_values)
         mean_return = np.mean(self.final_values)
@@ -305,7 +327,7 @@ class MonteCarloSimulation:
         buf.seek(0)
         return buf
 
-    def _return_format(self, fig, return_as_json: bool):
+    def _return_format(self, fig: Figure, return_as_json: bool) -> Union[str, Figure]:
         if return_as_json:
             return fig.to_json()  # Return as JSON string for API use
         else:
