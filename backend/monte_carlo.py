@@ -111,7 +111,7 @@ class MonteCarloSimulation:
             y=average_values,
             mode='lines+markers',
             name='Average Portfolio Value',
-            line=dict(color='#FFA500'),
+            line=dict(color='#007acc'),
         ))
 
         fig.add_annotation(
@@ -211,6 +211,9 @@ class MonteCarloSimulation:
         # Set up custom diverging colormap (Green for positive, Red for negative)
         cmap = sns.diverging_palette(10, 150, s=85, l=50, n=500, center="light")
 
+        # Create a mask to hide the upper triangle of the matrix (for a lower triangle heatmap)
+        mask = np.triu(np.ones_like(self.stock_data.corr_matrix, dtype=bool))
+
         sns.heatmap(
             self.stock_data.corr_matrix,
             annot=True,
@@ -218,19 +221,22 @@ class MonteCarloSimulation:
             cmap=cmap,
             square=True,
             xticklabels=self.stock_data.stocks,
-            yticklabels=self.stock_data.stocks,
+            yticklabels=False,
             vmin=-1,
             vmax=1,
             cbar_kws={"label": "Correlation Coefficient", "shrink": 0.4},
             annot_kws={"size": 12, "color": "white", "weight": "bold"},
             linewidths=2.2,
-            linecolor=(0,0,0,1) 
+            linecolor=(0,0,0,0),
+            mask=mask
         )
 
         # Customize text and background
         # plt.title("Stock Correlation Matrix", color="white")
         plt.xticks(color="white")
         plt.yticks(color="white")
+        ax = plt.gca()  # Get current axis
+        ax.set_xlabel('Ticker', color='white')
 
         # Set transparent background
         fig = plt.gcf()
