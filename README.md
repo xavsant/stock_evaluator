@@ -110,4 +110,5 @@ For the end-state, imports of modules within the project are done using absolute
 - Edit increments for streamlit user inputs
 - Edit WebScraper class to behave in a more OOP way, returning objects
 - Only use pickle for models, use JSON for dict
+- Edit risk metrics summary table to return data to frontend, instead of image (create table in streamlit)
 - Input descriptive information for streamlit pages from JSON as opposed to hard-code markdown
