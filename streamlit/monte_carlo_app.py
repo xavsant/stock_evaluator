@@ -291,7 +291,7 @@ def sidebar():
         except ConnectionError:
             st.info("The backend is currently unreachable. It might be waking up. Please try again in a few moments.")
         except Exception as e:
-            st.error(f"Encountered an unhandled exception: {type(e).__name__}. Please report this issue to the repository owner for assistance.")
+            st.error(f"Encountered an unhandled exception: {type(e).__name__}. Please try again. If the error persists, report this issue to the repository owner for assistance.")
 
 def main():
     sidebar()
