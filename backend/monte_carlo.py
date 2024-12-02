@@ -304,7 +304,7 @@ class MonteCarloSimulation:
         for (row, col), cell in table.get_celld().items():
             cell.set_edgecolor('white')
             if row == 0:  # Header row
-                cell.set_facecolor('#202020')
+                cell.set_facecolor('#007acc')
                 cell.set_text_props(color='white', weight='bold')
             else:  # Data rows
                 cell.set_facecolor('none')

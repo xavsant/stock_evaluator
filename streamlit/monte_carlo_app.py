@@ -10,6 +10,7 @@ from PIL import Image
 from io import BytesIO
 
 # Utility
+from requests.exceptions import ConnectionError
 from PIL.Image import Image as PIL_Image
 from plotly.graph_objects import Figure
 
@@ -23,7 +24,8 @@ def get_tickers() -> str:
     if "tickers" in st.session_state:
         return st.session_state.tickers
     else:
-        st.warning("No tickers initialized. Please restart the app.")
+        st.warning("No tickers initialised. Please restart the app.")
+        return []
 
 def monte_carlo_initialise_request(stock_symbols: list, num_each_stock: list, historical_timeframe: int, forecast_timeframe: int, num_simulations: int) -> dict:
      header = {"Content-Type": "application/json"}
@@ -243,44 +245,53 @@ def sidebar():
     historical_timeframe = st.sidebar.slider("Historical Range (days):", 
                                            value=st.session_state.historical_timeframe,
                                            min_value=90, 
-                                           max_value=1825)
+                                           max_value=1825,
+                                           step=10)
     forecast_timeframe = st.sidebar.slider("Forecast Range (days):", 
                                          value=st.session_state.forecast_timeframe,
                                          min_value=30, 
-                                         max_value=365)
+                                         max_value=365,
+                                         step=5)
     num_simulations = st.sidebar.slider("Number of Simulations:", 
                                       value=st.session_state.num_simulations,
                                       min_value=100, 
-                                      max_value=1000)
+                                      max_value=1000,
+                                      step=50)
 
     generate_button = st.sidebar.button("Generate")
 
     if generate_button:
-        st.session_state.generated = True
-        
-        monte_carlo_initialise_request(stock_symbols, list(num_each_stock.values()), 
-                                     historical_timeframe, forecast_timeframe, num_simulations)
-        
-        # Get key data and store portfolio value separately
-        key_data = monte_carlo_get_key_data()
-        st.session_state.portfolio_value = key_data.pop("portfolio_value")
-        
-        # Store all results in session state
-        st.session_state.monte_carlo_results = {
-            'key_data': key_data,
-            'plot_simulation_lines': monte_carlo_plot_simulation_lines(),
-            'plot_simulation_avg': monte_carlo_plot_simulation_avg(),
-            'plot_individual_cumulative_returns': monte_carlo_plot_individual_cumulative_returns(),
-            'plot_histogram_with_risk_metrics': monte_carlo_plot_histogram_with_risk_metrics(),
-            'plot_corr_heatmap': monte_carlo_plot_corr_heatmap(),
-            'risk_metrics': monte_carlo_generate_risk_metrics()
-        }
-        
         # Save current parameters
         st.session_state.stock_symbols = stock_symbols
         st.session_state.historical_timeframe = historical_timeframe
         st.session_state.forecast_timeframe = forecast_timeframe
         st.session_state.num_simulations = num_simulations
+        st.session_state.num_each_stock = num_each_stock
+
+        try:
+            st.session_state.generated = True
+            
+            monte_carlo_initialise_request(st.session_state.stock_symbols, list(st.session_state.num_each_stock.values()), 
+                                        st.session_state.historical_timeframe, st.session_state.forecast_timeframe, st.session_state.num_simulations)
+            
+            # Get key data and store portfolio value separately
+            key_data = monte_carlo_get_key_data()
+            st.session_state.portfolio_value = key_data.pop("portfolio_value")
+            
+            # Store all results in session state
+            st.session_state.monte_carlo_results = {
+                'key_data': key_data,
+                'plot_simulation_lines': monte_carlo_plot_simulation_lines(),
+                'plot_simulation_avg': monte_carlo_plot_simulation_avg(),
+                'plot_individual_cumulative_returns': monte_carlo_plot_individual_cumulative_returns(),
+                'plot_histogram_with_risk_metrics': monte_carlo_plot_histogram_with_risk_metrics(),
+                'plot_corr_heatmap': monte_carlo_plot_corr_heatmap(),
+                'risk_metrics': monte_carlo_generate_risk_metrics()
+            }
+        except ConnectionError:
+            st.info("The backend is currently unreachable. It might be waking up. Please try again in a few moments.")
+        except Exception as e:
+            st.error(f"Encountered an unhandled exception: {type(e).__name__}. Please report this issue to the repository owner for assistance.")
 
 def main():
     sidebar()

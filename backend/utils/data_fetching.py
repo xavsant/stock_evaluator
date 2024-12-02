@@ -50,7 +50,7 @@ class WebScraper:
                     self.get_request(self.name2ticker_dict[name])
                     break
         if self.stock_name == None:
-            raise ValueError("Stock does not exist!")
+            raise ValueError("Stock does not exist or could not accessed.")
         
     def get_request(self, url_extension: str) -> None:
         response = requests.get(self.url + url_extension + '/')
