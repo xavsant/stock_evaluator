@@ -88,7 +88,7 @@ For the end-state, imports of modules within the project are done using absolute
 - [Frontend](https://stock-evaluator-30590.streamlit.app)
 - [Interactive Backend](https://stock-evaluator-djr5.onrender.com/docs)
 
-*Note: Your IP may need to be given access to use the live versions*
+*Note: It may take some time for the backend to initialise if it's asleep." Your IP may need to be given access to use the live versions*
 
 **Backend Locally with Docker:**
 1. Run `docker build -t image_name -f Dockerfile_backend .` in your command line
