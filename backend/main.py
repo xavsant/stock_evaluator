@@ -105,6 +105,8 @@ async def stock_sentiment_analysis(stock: str) -> dict:
         return {"success": True, "payload": result}
     except TimeoutError as e:
         return {"success": False, "error": str(e)}
+    except ValueError as e:
+        return {"success": False, "error": str(e)}
     
 # ---
 # Black Scholes Merton Options

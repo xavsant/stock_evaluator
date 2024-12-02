@@ -98,6 +98,7 @@ For the end-state, imports of modules within the project are done using absolute
     API Docs: [For interactively testing backend functions](http://0.0.0.0:8000/docs)
 
 #### [5] ToDo
+- Fix web scraper inconsistency issues
 - Add error handling for incorrect input values in streamlit
 - Only use pickle for models, use JSON for dict
 - Extract descriptive information for pages from JSON (as opposed to hard-code)
