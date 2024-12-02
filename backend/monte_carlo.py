@@ -224,7 +224,7 @@ class MonteCarloSimulation:
             cbar_kws={"label": "Correlation Coefficient", "shrink": 0.4},
             annot_kws={"size": 11, "color": "white", "weight": "bold"},
             linewidths=2,
-            linecolor=None
+            linecolor="white"
         )
 
         # Customise text and background
@@ -246,8 +246,13 @@ class MonteCarloSimulation:
         # Colorbar
         cbar = ax.collections[0].colorbar
         cbar.set_ticks([-1, 0, 1])
-        cbar.ax.tick_params(labelcolor = "white")
+        cbar.ax.tick_params(colors="white")
         cbar.set_label("Correlation Coefficient", color='white')
+
+        for _, spine in ax.spines.items():
+            spine.set_visible(True)
+            spine.set_linewidth(2)  # Set outer line width
+            spine.set_edgecolor("white")  # Set the color for the spine (border line)
 
         # Save to a buffer
         buf = BytesIO()
