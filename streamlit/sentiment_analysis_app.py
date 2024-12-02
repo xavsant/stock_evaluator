@@ -3,6 +3,9 @@ import streamlit as st
 from requests import post as rpost
 from os import environ
 
+# Utility
+from requests.exceptions import ConnectionError
+
 # Initialise POST URL
 backend_url = environ["BACKEND_URL"]
 
@@ -10,7 +13,8 @@ def get_tickers() -> str:
     if "tickers" in st.session_state:
         return st.session_state.tickers
     else:
-        st.warning("No tickers initialized. Please restart the app.")
+        st.warning("No tickers initialised. Please restart the app.")
+        return []
 
 def sentiment_request(stock: str) -> dict:
     header = {"Content-Type": "application/json"}
@@ -82,15 +86,24 @@ def sidebar():
     generate_button = st.sidebar.button("Generate")
 
     if generate_button:
-        sentiment_response = sentiment_request(stock)
+        try:
+            sentiment_response = sentiment_request(stock)
 
-        if sentiment_response["success"]:
-            st.session_state.sentiment_results = sentiment_response
-            st.session_state.generated = True
-            st.session_state.selected_stock = stock
+            if sentiment_response["success"]:
+                st.session_state.sentiment_results = sentiment_response
+                st.session_state.generated = True
+                st.session_state.selected_stock = stock
 
-        else:
-            st.error(f"The web scraper encountered difficulties accessing {stock},  \n  please visit https://finance.yahoo.com/quote/{stock}/ directly instead.")
+            elif not sentiment_response["success"] and sentiment_response["error"] == "Stock does not exist or could not accessed.":
+                st.error(f"The web scraper encountered difficulties accessing {stock},  \n  please visit https://finance.yahoo.com/quote/{stock}/ directly instead.")
+            
+            elif not sentiment_response["success"] and sentiment_response["error"] == "TimeoutError":
+                st.error("The web scraper timed out, please try again.")
+    
+        except ConnectionError:
+            st.info("The backend is currently unreachable. It might be waking up. Please try again in a few moments.")
+        except Exception as e:
+            st.error(f"Encountered an unhandled exception: {type(e).__name__}. Please report this issue to the repository owner for assistance.")
 
     # Display saved results if they exist
     if st.session_state.generated and st.session_state.sentiment_results:

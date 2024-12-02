@@ -103,8 +103,8 @@ async def stock_sentiment_analysis(stock: str) -> dict:
         app = Stock_SentimentAnalysis(stock)
         result = app.run()
         return {"success": True, "payload": result}
-    except TimeoutError as e:
-        return {"success": False, "error": str(e)}
+    except TimeoutError:
+        return {"success": False, "error": "TimeoutError"}
     except ValueError as e:
         return {"success": False, "error": str(e)}
     

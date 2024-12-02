@@ -9,6 +9,7 @@ from PIL import Image
 from io import BytesIO
 
 # Utility
+from requests.exceptions import ConnectionError
 from PIL.Image import Image as PIL_Image
 
 # Initialise POST URL
@@ -18,7 +19,8 @@ def get_tickers() -> str:
     if "tickers" in st.session_state:
         return st.session_state.tickers
     else:
-        st.warning("No tickers initialized. Please restart the app.")
+        st.warning("No tickers initialised. Please restart the app.")
+        return []
 
 def stock_spot_and_volatility() -> dict:
     stock = st.sidebar.selectbox("Select Stock Option:", options = get_tickers(), index = 9)
@@ -127,17 +129,17 @@ def sidebar():
     stock_data = stock_spot_and_volatility()
     spot_price = stock_data["spot_price"]
     sigma = stock_data["volatility"]
-    strike_price = max(stock_data["spot_price"] - 5, 0.0)  # Default strike price to spot price -5
+    strike_price = max(stock_data["spot_price"] - 5, 0.0001)  # Default strike price to spot price -5
     
     # Display the API-fetched values
-    st.sidebar.number_input("Spot Price:", min_value=0.0, value=spot_price, disabled=True)
-    sigma = st.sidebar.number_input("Volatility:", min_value=0.0, value=sigma)
-    strike_price = st.sidebar.number_input("Strike Price:", min_value=0.0, value=strike_price)
+    st.sidebar.number_input("Spot Price:", min_value=0.0001, value=spot_price, disabled=True)
+    sigma = st.sidebar.number_input("Volatility:", min_value=0.0001, value=sigma)
+    strike_price = st.sidebar.number_input("Strike Price:", min_value=0.0001, value=strike_price)
     
     # Use session state for other inputs
-    time = st.sidebar.number_input("Time to Expiration (days):", min_value=0, key='time')
+    time = st.sidebar.number_input("Time to Expiration (days):", min_value=1, key='time')
     premium = st.sidebar.number_input("Option Premium:", min_value=0.0, key='premium')
-    interest_rate = st.sidebar.number_input("Risk Free Interest Rate:", min_value=0.01, key='interest_rate')
+    interest_rate = st.sidebar.number_input("Risk Free Interest Rate:", min_value=0.0, key='interest_rate')
     position = st.sidebar.selectbox("Type of Position", options=['Buy (Long)', 'Sell (Short)'], key='position')
     option_type = st.sidebar.selectbox("Type of Option", options=['Call (📈)', 'Put (📉)'], key='option_type')
 
@@ -149,18 +151,23 @@ def sidebar():
     generate_button = st.sidebar.button("Generate")
 
     if generate_button:
-        black_scholes_merton_initialise_request(interest_rate, spot_price, strike_price, time, sigma,
-                                              premium, position, option_type)
-        
-        # Store all results in session state
-        st.session_state.bsm_results = {
-            'greeks': black_scholes_merton_get_greeks(),
-            'plot_payoffs': black_scholes_merton_plot_payoff(),
-            'position': position,
-            'option_type': option_type,
-            'premium': premium
-        }
-        st.session_state.generated = True
+        try:
+            black_scholes_merton_initialise_request(interest_rate, spot_price, strike_price, time, sigma,
+                                                premium, position, option_type)
+            
+            # Store all results in session state
+            st.session_state.bsm_results = {
+                'greeks': black_scholes_merton_get_greeks(),
+                'plot_payoffs': black_scholes_merton_plot_payoff(),
+                'position': position,
+                'option_type': option_type,
+                'premium': premium
+            }
+            st.session_state.generated = True
+        except ConnectionError:
+            st.info("The backend is currently unreachable. It might be waking up. Please try again in a few moments.")
+        except Exception as e:
+            st.error(f"Encountered an unhandled exception: {type(e).__name__}. Please report this issue to the repository owner for assistance.")
 
     # Display saved results if they exist
     if st.session_state.generated and st.session_state.bsm_results:
