@@ -2,10 +2,23 @@
 import streamlit as st
 from requests import post as rpost
 from backend.utils.data_fetching import Black_Scholes_Merton_StockData
+from os import environ
 
 # Plot Imports
 from PIL import Image
 from io import BytesIO
+
+# Initialise POST URL
+backend_url = environ["BACKEND_URL"]
+
+# Validation Check for Yahoo Finance
+import yfinance as yf
+
+try:
+    ticker = "AAPL"
+    data = yf.download(ticker, period="1d")
+except Exception as e:
+    st.error(f"Error accessing Yahoo Finance: {e}")
 
 def get_tickers():
     if "tickers" in st.session_state:
@@ -41,7 +54,7 @@ def black_scholes_merton_initialise_request(interest_rate: float, spot_price: fl
          }
 
      response = rpost(
-          url="http://0.0.0.0:8000/initialise_black_scholes_merton",
+          url=backend_url+"/initialise_black_scholes_merton",
           headers=header,
           json=parameters
      )
@@ -52,7 +65,7 @@ def black_scholes_merton_get_greeks():
     header = {"Content-Type": "application/json"}
 
     response = rpost(
-          url="http://0.0.0.0:8000/black_scholes_merton_option/get_greeks",
+          url=backend_url+"/black_scholes_merton_option/get_greeks",
           headers=header
      )
 
@@ -62,7 +75,7 @@ def black_scholes_merton_plot_payoff():
     header = {"Content-Type": "application/json"}
 
     response = rpost(
-          url="http://0.0.0.0:8000/black_scholes_merton_option/plot_payoff",
+          url=backend_url+"/black_scholes_merton_option/plot_payoff",
           headers=header,
           stream=True
     )
@@ -117,7 +130,7 @@ def sidebar():
     stock_data = stock_spot_and_volatility()
     spot_price = stock_data["spot_price"]
     sigma = stock_data["volatility"]
-    strike_price = stock_data["spot_price"] - 5  # Default strike price to spot price -5
+    strike_price = max(stock_data["spot_price"] - 5, 0.0)  # Default strike price to spot price -5
     
     # Display the API-fetched values
     st.sidebar.number_input("Spot Price:", min_value=0.0, value=spot_price, disabled=True)
@@ -167,20 +180,15 @@ def sidebar():
                             ###### **option_price** 
                             The option price (also known as the premium) is the market price of an option. It represents the cost to purchase the option contract and is influenced by various factors such as the underlying asset price, strike price, time to expiration, implied volatility, and interest rates. It is typically calculated using the Black-Scholes-Merton (BSM) model, which is a widely used mathematical model for pricing European-style options.
                             
-                            **delta**
-                            Delta is a measure of the change in an option's price or premium resulting from a change in the underlying asset. It provides an estimate of how much the option price will move for a small change in the underlying asset's price. A delta of 0.5 means the option's price will increase by \$0.50 for every \$1 increase in the underlying asset.
+                            - **delta**: Measures the change in an option's price or premium resulting from a change in the underlying asset. It provides an estimate of how much the option price will move for a small change in the underlying asset's price. A delta of 0.5 means the option's price will increase by 0.50 for every 1 increase in the underlying asset.
                             
-                            **gamma**
-                            Gamma measures the rate of change of delta as the price of the underlying asset changes. It helps forecast how much the delta will change for a given change in the underlying asset's price. It also provides insights into the curvature of the option's price curve relative to the underlying asset, indicating the potential for larger price movements as the underlying asset fluctuates.
+                            - **gamma**: Measures the rate of change of delta as the price of the underlying asset changes. It helps forecast how much the delta will change for a given change in the underlying asset's price. It also provides insights into the curvature of the option's price curve relative to the underlying asset, indicating the potential for larger price movements as the underlying asset fluctuates.
                             
-                            **vega**
-                            Vega measures the risk of changes in implied volatility or the forward-looking expected volatility of the underlying asset price. As implied volatility increases, the price of options tends to rise, and vega quantifies how much the price of an option will change with a 1% change in implied volatility. This is especially important for options traders who anticipate volatility changes in the market.
+                            - **vega**: Measures the risk of changes in implied volatility or the forward-looking expected volatility of the underlying asset price. As implied volatility increases, the price of options tends to rise, and vega quantifies how much the price of an option will change with a 1% change in implied volatility. This is especially important for options traders who anticipate volatility changes in the market.
                             
-                            **theta**
-                            Theta measures time decay in the value of an option or its premium. It shows how much the value of an option decreases as time passes, all else being equal. A higher absolute theta indicates faster time decay, which is crucial for option holders and sellers to understand, especially as expiration dates approach.
+                            - **theta**: Measures time decay in the value of an option or its premium. It shows how much the value of an option decreases as time passes, all else being equal. A higher absolute theta indicates faster time decay, which is crucial for option holders and sellers to understand, especially as expiration dates approach.
                             
-                            **rho**
-                            Rho measures an option's sensitivity to changes in the risk-free rate of interest. It indicates how much the price of an option will increase or decrease in response to a 1% change in the risk-free interest rate. Rho is particularly relevant when considering economic conditions and central bank policy, as changes in interest rates can impact options pricing.
+                            - **rho**: Measures an option's sensitivity to changes in the risk-free rate of interest. It indicates how much the price of an option will increase or decrease in response to a 1% change in the risk-free interest rate. Rho is particularly relevant when considering economic conditions and central bank policy, as changes in interest rates can impact options pricing.
                             """)
 
             st.markdown("**Comparing Black-Scholes-Merton-Calculated Premium against User Input Premium**")

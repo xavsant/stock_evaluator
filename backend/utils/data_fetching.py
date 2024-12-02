@@ -4,7 +4,6 @@ from bs4 import BeautifulSoup
 # Fetching Stock Data
 import yfinance as yf
 import datetime as dt
-import pandas as pd
 import requests
 
 # Utility
@@ -13,7 +12,6 @@ import requests
 import pickle
 from dotenv import load_dotenv
 load_dotenv()
-from os import environ
 
 # Get directory of pickled models
 base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -159,11 +157,8 @@ class Black_Scholes_Merton_StockData:
     
 class Finnhub:
     @staticmethod
-    def get_tickers():
-        # API Call
-        finnhub_api_key = environ["FINNHUB_API_KEY"]
-
-        url = f"https://finnhub.io/api/v1/stock/symbol?exchange=US&token={finnhub_api_key}"
+    def get_tickers(api_key):
+        url = f"https://finnhub.io/api/v1/stock/symbol?exchange=US&token={api_key}"
         response = requests.get(url)
         tickers = response.json()
 
@@ -173,14 +168,6 @@ class Finnhub:
             for ticker in tickers
             if ticker["mic"] == "XNAS"
         ]
-
-        # nasdaq_tickers = [
-        #     {"Symbol": ticker["symbol"], "Company Name": ticker["description"]}
-        #     for ticker in tickers
-        #     if ticker["mic"] == "XNAS"
-        # ]
-
-        # nasdaq_tickers_sorted = sorted(nasdaq_tickers, key=lambda x: x["Symbol"])
 
         nasdaq_tickers_sorted = sorted(nasdaq_tickers)
         return nasdaq_tickers_sorted
