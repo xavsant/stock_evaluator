@@ -27,31 +27,32 @@ The backend of this project is hosted on Render, and the frontend on Streamlit. 
 ```
 stock_evaluator/
 │
-├── app.py                      # Streamlit app with options to select analysis and view results
+├── app.py                              # Streamlit app
 │
 ├── backend/
-│   ├── __init__.py             # Initialise backend packages
+│   ├── __init__.pys
 │   ├── black_scholes_merton.py
 │   ├── monte_carlo.py
 │   ├── sentiment_analysis.py  
-│   ├── main.py                 # FastAPI app with endpoints for each analysis    
-│   ├── utils/                  # Helper functions
+│   ├── main.py                         # FastAPI app  
+│   ├── utils/                          # Helper functions
 │   │   ├── __init__.py
-│   │   └── data_fetching.py    # Functions to fetch stock data from Yahoo Finance
+│   │   └── data_fetching.py            # Functions to fetch stock data
 │   └── models/     
 │       ├── __init__.py            
-│       └── sentiment_model.py        
+│       └── maxent_sentiment_classifier.pkl
+│       └── ...        
 │
-├── streamlit/                  # Streamlit pages
+├── streamlit/                          # Streamlit pages
 │   ├── black_scholes_merton_app.py
 │   ├── monte_carlo_app.py
 │   └── sentiment_analysis_app.py  
 │
 ├── notebooks/
-│   └── ...                     # For feature experimentation
+│   └── ...                             # For feature experimentation
 │
-├── Dockerfile_backend
-├── requirements.txt            # Dependencies
+├── Dockerfile                          # Backend Docker container
+├── requirements.txt                    # Dependencies
 └── README.md
 ```
 
@@ -87,7 +88,7 @@ stock_evaluator/
 - [plotly](https://pypi.org/project/plotly/)
 - [seaborn](https://pypi.org/project/seaborn/)
 
-> Refer to requirements.txt for more information on dependencies.
+> Refer to requirements.txt for more information on dependencies
 
 ---
 
@@ -97,13 +98,23 @@ stock_evaluator/
 If any packages/dependencies are updated via poetry, be sure to export the requirements.txt using the following:
 `poetry export --without-hashes -f requirements.txt -o requirements.txt`
 
-For the end-state, imports of modules within the project are done using absolute filepaths. This is because of the nature of fastapi. To run specific files in isolation you will have to edit the imports (i.e. from backend.utils.data_fetching import WebScraper becomes from utils import Webscraper).
+#### **Import Behaviour in Different Environments:**
+
+*End-State*
+  When the app is running as a complete system (e.g., containerised in Docker, or through app.py or main.py), imports use **absolute file paths**. For example:
+  `from backend.utils.data_fetching import WebScraper`
+
+*Running Individual Files*
+  When running specific files like app.py or main.py independently, import paths need to be adjusted. For example:
+  `from utils import WebScraper`
+
+This difference is due to how file execution context affects module resolution between a full system setup and individual file execution.
 
 #### **Live version:**
 - [Frontend](https://stock-evaluator-30590.streamlit.app)
 - [Interactive Backend](https://stock-evaluator-djr5.onrender.com/docs)
 
-> Note: The backend may take time to re-deploy if asleep.
+> The backend may take time to re-deploy if asleep
 
 #### **Running Locally with Docker (Backend only):**
 1. Run `docker build -t image_name -f Dockerfile_backend .` in your command line
@@ -117,7 +128,7 @@ For the end-state, imports of modules within the project are done using absolute
 
 ---
 
-### [5] ToDo
+### [5] To-Do
 - TD1: Clean up streamlit pages by moving functions to another .py
 - TD2: Edit WebScraper class to behave in a more OOP way, returning objects
 - TD3: Only use pickle for models, use JSON for dict
