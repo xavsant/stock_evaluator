@@ -6,7 +6,7 @@ import plotly.colors
 import plotly.graph_objects as go
 
 # Utility
-from backend.utils.data_fetching import MonteCarlo_StockData # demo + type hint
+from utils.data_fetching import MonteCarlo_StockData # demo + type hint
 from typing import Union, Tuple
 from matplotlib.figure import Figure
 from io import BytesIO
