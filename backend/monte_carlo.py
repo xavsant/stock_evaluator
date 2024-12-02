@@ -211,9 +211,6 @@ class MonteCarloSimulation:
         # Set up custom diverging colormap (Green for positive, Red for negative)
         cmap = sns.diverging_palette(10, 150, s=85, l=50, n=500, center="light")
 
-        # Create a mask to hide the upper triangle of the matrix (for a lower triangle heatmap)
-        mask = np.triu(np.ones_like(self.stock_data.corr_matrix, dtype=bool))
-
         sns.heatmap(
             self.stock_data.corr_matrix,
             annot=True,
@@ -221,14 +218,13 @@ class MonteCarloSimulation:
             cmap=cmap,
             square=True,
             xticklabels=self.stock_data.stocks,
-            yticklabels=False,
+            yticklabels=self.stock_data.stocks,
             vmin=-1,
             vmax=1,
             cbar_kws={"label": "Correlation Coefficient", "shrink": 0.4},
-            annot_kws={"size": 12, "color": "white", "weight": "bold"},
-            linewidths=2.2,
-            linecolor=(0,0,0,0),
-            mask=mask
+            annot_kws={"size": 11, "color": "white", "weight": "bold"},
+            linewidths=2,
+            linecolor=(0/255, 122/255, 204/255) # match streamlit primary colour
         )
 
         # Customize text and background
@@ -237,6 +233,7 @@ class MonteCarloSimulation:
         plt.yticks(color="white")
         ax = plt.gca()  # Get current axis
         ax.set_xlabel('Ticker', color='white')
+        ax.set_ylabel('Ticker', color='none')
 
         # Set transparent background
         fig = plt.gcf()

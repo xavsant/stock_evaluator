@@ -60,6 +60,7 @@ stock_evaluator/
 - [streamlit](https://pypi.org/project/streamlit/)
 
 **Function-Exclusive Packages**
+
 *Black Scholes Merton*
 - [scipy](https://pypi.org/project/scipy/)
 
