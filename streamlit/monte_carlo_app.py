@@ -245,15 +245,18 @@ def sidebar():
     historical_timeframe = st.sidebar.slider("Historical Range (days):", 
                                            value=st.session_state.historical_timeframe,
                                            min_value=90, 
-                                           max_value=1825)
+                                           max_value=1825,
+                                           step=10)
     forecast_timeframe = st.sidebar.slider("Forecast Range (days):", 
                                          value=st.session_state.forecast_timeframe,
                                          min_value=30, 
-                                         max_value=365)
+                                         max_value=365,
+                                         step=5)
     num_simulations = st.sidebar.slider("Number of Simulations:", 
                                       value=st.session_state.num_simulations,
                                       min_value=100, 
-                                      max_value=1000)
+                                      max_value=1000,
+                                      step=50)
 
     generate_button = st.sidebar.button("Generate")
 
