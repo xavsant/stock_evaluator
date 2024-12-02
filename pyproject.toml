@@ -15,7 +15,6 @@ fastapi = {extras = ["standard"], version = "^0.115.4"}
 yfinance = "^0.2.48"
 python-dotenv = "^1.0.1"
 beautifulsoup4 = "^4.12.3"
-selenium = "^4.26.1"
 requests = "^2.32.3"
 nltk = "^3.9.1"
 contractions = "^0.1.73"

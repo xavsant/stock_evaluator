@@ -8,25 +8,19 @@ from os import environ
 from PIL import Image
 from io import BytesIO
 
+# Utility
+from PIL.Image import Image as PIL_Image
+
 # Initialise POST URL
 backend_url = environ["BACKEND_URL"]
 
-# Validation Check for Yahoo Finance
-import yfinance as yf
-
-try:
-    ticker = "AAPL"
-    data = yf.download(ticker, period="1d")
-except Exception as e:
-    st.error(f"Error accessing Yahoo Finance: {e}")
-
-def get_tickers():
+def get_tickers() -> str:
     if "tickers" in st.session_state:
         return st.session_state.tickers
     else:
         st.warning("No tickers initialized. Please restart the app.")
 
-def stock_spot_and_volatility():
+def stock_spot_and_volatility() -> dict:
     stock = st.sidebar.selectbox("Select Stock Option:", options = get_tickers(), index = 9)
     options = ["1mo", "3mo", "6mo", "1y"]
     
@@ -39,7 +33,7 @@ def stock_spot_and_volatility():
     return stock_spot_and_volatility
 
 def black_scholes_merton_initialise_request(interest_rate: float, spot_price: float, strike_price: float, time: int, sigma: float, \
-                                   premium: float, position: str, option_type: str):
+                                   premium: float, position: str, option_type: str) -> dict:
      header = {"Content-Type": "application/json"}
 
      parameters = {
@@ -61,7 +55,7 @@ def black_scholes_merton_initialise_request(interest_rate: float, spot_price: fl
 
      return response.json()
 
-def black_scholes_merton_get_greeks():
+def black_scholes_merton_get_greeks() -> dict:
     header = {"Content-Type": "application/json"}
 
     response = rpost(
@@ -71,7 +65,7 @@ def black_scholes_merton_get_greeks():
 
     return response.json()
 
-def black_scholes_merton_plot_payoff():
+def black_scholes_merton_plot_payoff() -> PIL_Image:
     header = {"Content-Type": "application/json"}
 
     response = rpost(
@@ -84,7 +78,7 @@ def black_scholes_merton_plot_payoff():
 
     return response_image
 
-def compare_prices(theoretical_option_price: float, actual_option_price: float):
+def compare_prices(theoretical_option_price: float, actual_option_price: float) -> str:
     """
     Compares the theoretical option price calculated by the Black Scholes Merton model against the actual option price (spot price + premium)
     """
@@ -95,18 +89,21 @@ def compare_prices(theoretical_option_price: float, actual_option_price: float):
     else:
         'priced fairly'
 
-def evaluate_option_type(option_type: str):
+def evaluate_option_type(option_type: str) -> str:
     if option_type == 'Call (📈)':
         return 'call'
     else:
         return 'put'
     
-def evaluate_position(position: str):
+def evaluate_position(position: str) -> str:
     if position == 'Buy (Long)':
         return 'long'
     else:
         return 'short'
 
+# ---
+# Layout
+# ---
 def sidebar():
     st.sidebar.title("Input Variables")
 

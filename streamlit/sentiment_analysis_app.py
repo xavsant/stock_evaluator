@@ -6,13 +6,13 @@ from os import environ
 # Initialise POST URL
 backend_url = environ["BACKEND_URL"]
 
-def get_tickers():
+def get_tickers() -> str:
     if "tickers" in st.session_state:
         return st.session_state.tickers
     else:
         st.warning("No tickers initialized. Please restart the app.")
 
-def sentiment_request(stock: str):
+def sentiment_request(stock: str) -> dict:
      header = {"Content-Type": "application/json"}
 
      parameters = {"stock": stock}
@@ -25,7 +25,7 @@ def sentiment_request(stock: str):
 
      return response.json()
 
-def article_colour(summary: str):
+def article_colour(summary: str) -> str:
     if summary.lower() == "optimistic":
         colour = ':green'
     elif summary.lower() == "pessimistic":
@@ -35,7 +35,7 @@ def article_colour(summary: str):
 
     return colour
 
-def overall_sentiment(sentiment_summary_payload: dict):
+def overall_sentiment(sentiment_summary_payload: dict) -> tuple:
     summary = max(sentiment_summary_payload, key=sentiment_summary_payload.get)
     colour = article_colour(summary)
 

@@ -9,19 +9,23 @@ from json import loads
 from PIL import Image
 from io import BytesIO
 
+# Utility
+from PIL.Image import Image as PIL_Image
+from plotly.graph_objects import Figure
+
 # Initialise POST URL
 backend_url = environ["BACKEND_URL"]
 
 # Initialize tabs
 tab_simulation, tab_correlation_matrix, tab_simulation_average, tab_individual_cumulative_returns, tab_var_histogram, tab_risk_metrics_summary_table = st.tabs(["Simulation", "Correlation Matrix", "Simulation Average", "Individual Cumulative Returns", "VaR Histogram", "Risk Metrics Summary Table"])
 
-def get_tickers():
+def get_tickers() -> str:
     if "tickers" in st.session_state:
         return st.session_state.tickers
     else:
         st.warning("No tickers initialized. Please restart the app.")
 
-def monte_carlo_initialise_request(stock_symbols: list, num_each_stock: list, historical_timeframe: int, forecast_timeframe: int, num_simulations: int):
+def monte_carlo_initialise_request(stock_symbols: list, num_each_stock: list, historical_timeframe: int, forecast_timeframe: int, num_simulations: int) -> dict:
      header = {"Content-Type": "application/json"}
 
      parameters = {
@@ -40,7 +44,7 @@ def monte_carlo_initialise_request(stock_symbols: list, num_each_stock: list, hi
 
      return response.json()
 
-def monte_carlo_get_key_data():
+def monte_carlo_get_key_data() -> dict:
     header = {"Content-Type": "application/json"}
 
     response = rpost(
@@ -50,7 +54,7 @@ def monte_carlo_get_key_data():
 
     return response.json()
 
-def monte_carlo_plot_simulation_lines():
+def monte_carlo_plot_simulation_lines() -> Figure:
     response = rpost(
           url=backend_url+"/monte_carlo/plot_simulation_lines"
      )
@@ -60,7 +64,7 @@ def monte_carlo_plot_simulation_lines():
 
     return fig
 
-def monte_carlo_plot_simulation_avg():
+def monte_carlo_plot_simulation_avg() -> Figure:
     response = rpost(
           url=backend_url+"/monte_carlo/plot_simulation_avg"
      )
@@ -70,7 +74,7 @@ def monte_carlo_plot_simulation_avg():
 
     return fig
 
-def monte_carlo_plot_individual_cumulative_returns():
+def monte_carlo_plot_individual_cumulative_returns() -> Figure:
     response = rpost(
           url=backend_url+"/monte_carlo/plot_individual_cumulative_returns"
      )
@@ -80,7 +84,7 @@ def monte_carlo_plot_individual_cumulative_returns():
 
     return fig
 
-def monte_carlo_plot_histogram_with_risk_metrics():
+def monte_carlo_plot_histogram_with_risk_metrics() -> Figure:
     response = rpost(
           url=backend_url+"/monte_carlo/plot_histogram_with_risk_metrics"
      )
@@ -90,7 +94,7 @@ def monte_carlo_plot_histogram_with_risk_metrics():
 
     return fig
 
-def monte_carlo_plot_corr_heatmap():
+def monte_carlo_plot_corr_heatmap() -> PIL_Image:
     header = {"Content-Type": "application/json"}
 
     response = rpost(
@@ -103,7 +107,7 @@ def monte_carlo_plot_corr_heatmap():
 
     return response_image
 
-def monte_carlo_generate_risk_metrics():
+def monte_carlo_generate_risk_metrics() -> PIL_Image:
     header = {"Content-Type": "application/json"}
 
     response = rpost(
@@ -210,6 +214,9 @@ def popover_shares(portfolio):
 
     return shares
 
+# ---
+# Layout
+# ---
 def sidebar():
     st.sidebar.title("Input Variables")
 
