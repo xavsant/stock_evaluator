@@ -13,17 +13,17 @@ def get_tickers():
         st.warning("No tickers initialized. Please restart the app.")
 
 def sentiment_request(stock: str):
-     header = {"Content-Type": "application/json"}
+    header = {"Content-Type": "application/json"}
 
-     parameters = {"stock": stock}
+    parameters = {"stock": stock}
+     
+    response = rpost(
+    url=backend_url+"/stock_sentiment_analysis",
+    headers=header,
+    params=parameters
+    )
 
-     response = rpost(
-          url=backend_url+"/stock_sentiment_analysis",
-          headers=header,
-          params=parameters
-     )
-
-     return response.json()
+    return response.json()
 
 def article_colour(summary: str):
     if summary.lower() == "optimistic":
@@ -83,9 +83,14 @@ def sidebar():
 
     if generate_button:
         sentiment_response = sentiment_request(stock)
-        st.session_state.sentiment_results = sentiment_response
-        st.session_state.generated = True
-        st.session_state.selected_stock = stock
+
+        if sentiment_response["success"]:
+            st.session_state.sentiment_results = sentiment_response
+            st.session_state.generated = True
+            st.session_state.selected_stock = stock
+
+        else:
+            st.error(f"The web scraper encountered difficulties accessing {stock}, please visit https://finance.yahoo.com/quote/{stock}/ instead.")
 
     # Display saved results if they exist
     if st.session_state.generated and st.session_state.sentiment_results:

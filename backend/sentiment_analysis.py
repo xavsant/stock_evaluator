@@ -42,7 +42,12 @@ class SentimentAnalysis:
 class Stock_SentimentAnalysis:
     def __init__(self, stock):
         self.stock = stock
-        self.scraper = WebScraper(stock)
+        
+        try:
+            self.scraper = WebScraper(stock)
+        except ValueError as e:
+            raise e
+        
         self.analyzer = SentimentAnalysis()
         self.articles = []
         self.sentiment_count = {'optimistic': 0, 'neutral': 0, 'pessimistic': 0}
