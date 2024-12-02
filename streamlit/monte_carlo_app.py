@@ -246,7 +246,7 @@ def sidebar():
                                            value=st.session_state.historical_timeframe,
                                            min_value=90, 
                                            max_value=1825,
-                                           step=10)
+                                           step=5)
     forecast_timeframe = st.sidebar.slider("Forecast Range (days):", 
                                          value=st.session_state.forecast_timeframe,
                                          min_value=30, 
