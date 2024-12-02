@@ -224,24 +224,26 @@ class MonteCarloSimulation:
             cbar_kws={"label": "Correlation Coefficient", "shrink": 0.4},
             annot_kws={"size": 11, "color": "white", "weight": "bold"},
             linewidths=2,
-            linecolor=(0/255, 122/255, 204/255) # match streamlit primary colour
+            linecolor=None
         )
 
-        # Customize text and background
+        # Customise text and background
         # plt.title("Stock Correlation Matrix", color="white")
         plt.xticks(color="white")
         plt.yticks(color="white")
         ax = plt.gca()  # Get current axis
         ax.set_xlabel('Ticker', color='white')
         ax.set_ylabel('Ticker', color='none')
+        ax.tick_params(axis='x', colors='white')
+        ax.tick_params(axis='y', colors='white')
 
-        # Set transparent background
+        # Background
         fig = plt.gcf()
         fig.patch.set_facecolor('none')
         ax = plt.gca()
         ax.set_facecolor('none')
 
-        # Customize the color bar tick labels
+        # Colorbar
         cbar = ax.collections[0].colorbar
         cbar.set_ticks([-1, 0, 1])
         cbar.ax.tick_params(labelcolor = "white")
