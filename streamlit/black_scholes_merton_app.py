@@ -167,7 +167,7 @@ def sidebar():
         except ConnectionError:
             st.info("The backend is currently unreachable. It might be waking up. Please try again in a few moments.")
         except Exception as e:
-            st.error(f"Encountered an unhandled exception: {type(e).__name__}. Please report this issue to the repository owner for assistance.")
+            st.error(f"Encountered an unhandled exception: {type(e).__name__}. Please try again. If the error persists, report this issue to the repository owner for assistance.")
 
     # Display saved results if they exist
     if st.session_state.generated and st.session_state.bsm_results:
@@ -205,8 +205,8 @@ def sidebar():
 
 # Layout for the application
 def main():
-    st.header("Black Scholes Merton for Stock Options")
-    st.markdown("This function uses the Black Scholes Merton model to generate key insights for a chosen stock option.")
+    st.header("Black-Scholes-Merton for Stock Options")
+    st.markdown("This function uses the Black-Scholes-Merton model to generate key insights for a chosen stock option.")
     st.caption("Select your variables in the column on the left.")
     with st.popover("More information"):
         st.markdown("""
