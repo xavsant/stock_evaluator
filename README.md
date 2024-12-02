@@ -11,7 +11,12 @@ Index:
 
 Web Application for Portfolio Stock Evaluation using Monte Carlo simulations, Black-Scholes-Merton model for Stock Options, and Sentiment Analysis. Provides a comprehensive overview of a chosen stock/portfolio based on gaussian simulations, theoretical option premium calculations and article reviews.
 
-![Web Application](./notebooks/screenshots/MonteCarlo_screenshot.png)
+The backend of this project is hosted on Render, and the frontend on Streamlit.
+
+![Web Application](./notebooks/screenshots/Monte_Carlo_Simulations_screenshot.png)
+![Web Application](./notebooks/screenshots/Black_Scholes_Merton_screenshot.png)
+![Web Application](./notebooks/screenshots/Sentiment_Analysis_screenshot.png)
+
 
 #### [2] Structure
 ```
@@ -60,6 +65,7 @@ stock_evaluator/
 - [streamlit](https://pypi.org/project/streamlit/)
 
 **Function-Exclusive Packages**
+
 *Black Scholes Merton*
 - [scipy](https://pypi.org/project/scipy/)
 
@@ -88,7 +94,7 @@ For the end-state, imports of modules within the project are done using absolute
 - [Frontend](https://stock-evaluator-30590.streamlit.app)
 - [Interactive Backend](https://stock-evaluator-djr5.onrender.com/docs)
 
-*Note: It may take some time for the backend to initialise if it's asleep." Your IP may need to be given access to use the live versions*
+*Note: It may take some time for the backend to initialise if it's asleep. Your IP may need to be given access to use the live versions*
 
 **Backend Locally with Docker:**
 1. Run `docker build -t image_name -f Dockerfile_backend .` in your command line
@@ -100,11 +106,12 @@ For the end-state, imports of modules within the project are done using absolute
 2. Backend: Run `fastapi run backend/main.py` in your command line
     API Docs: [For interactively testing backend functions](http://0.0.0.0:8000/docs)
 
+
 #### [5] ToDo
 - Add error handling for incorrect input values in streamlit
 - Add error handling when backend hasn't initialised
 - Fix web scraper inconsistency issues
-- Fix streamlit web app issue with Black_Scholes_Merton_StockData class (works properly after restart)
+- Fix streamlit web app bug with Black_Scholes_Merton_StockData class (flakey)
 - Fix caching issue with explanatory text on Monte Carlo page
 - Clean up streamlit pages by moving functions to another .py
 - Edit increments for streamlit user inputs
