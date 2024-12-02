@@ -72,6 +72,7 @@ WIP.
     API Docs: [For interactively testing backend functions](http://0.0.0.0:8000/docs)
 
 #### [5] ToDo
+- Fix web scraper inconsistency issues
 - Add error handling for incorrect input values in streamlit
 - Update input and output hinting for class functions
 - Update dependencies in README
