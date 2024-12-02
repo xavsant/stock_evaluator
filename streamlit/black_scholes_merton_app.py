@@ -134,11 +134,11 @@ def sidebar():
     # Display the API-fetched values
     st.sidebar.number_input("Spot Price:", min_value=0.0001, value=spot_price, disabled=True)
     sigma = st.sidebar.number_input("Volatility:", min_value=0.0001, value=sigma)
-    strike_price = st.sidebar.number_input("Strike Price:", min_value=0.0001, value=strike_price, step=1)
+    strike_price = st.sidebar.number_input("Strike Price:", min_value=0.0001, value=strike_price, step=0.5)
     
     # Use session state for other inputs
     time = st.sidebar.number_input("Time to Expiration (days):", min_value=1, key='time')
-    premium = st.sidebar.number_input("Option Premium:", min_value=0.0, key='premium', step=1)
+    premium = st.sidebar.number_input("Option Premium:", min_value=0.0, key='premium', step=0.5)
     interest_rate = st.sidebar.number_input("Risk Free Interest Rate:", min_value=0.0, key='interest_rate', step=0.01)
     position = st.sidebar.selectbox("Type of Position", options=['Buy (Long)', 'Sell (Short)'], key='position')
     option_type = st.sidebar.selectbox("Type of Option", options=['Call (📈)', 'Put (📉)'], key='option_type')
