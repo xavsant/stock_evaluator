@@ -88,7 +88,7 @@ For the end-state, imports of modules within the project are done using absolute
 - [Frontend](https://stock-evaluator-30590.streamlit.app)
 - [Interactive Backend](https://stock-evaluator-djr5.onrender.com/docs)
 
-*Note: Your IP may need to be given access to use the live versions*
+*Note: It may take some time for the backend to initialise if it's asleep." Your IP may need to be given access to use the live versions*
 
 **Backend Locally with Docker:**
 1. Run `docker build -t image_name -f Dockerfile_backend .` in your command line
@@ -102,6 +102,7 @@ For the end-state, imports of modules within the project are done using absolute
 
 #### [5] ToDo
 - Add error handling for incorrect input values in streamlit
+- Add error handling when backend hasn't initialised
 - Fix web scraper inconsistency issues
 - Fix streamlit web app issue with Black_Scholes_Merton_StockData class (works properly after restart)
 - Fix caching issue with explanatory text on Monte Carlo page
