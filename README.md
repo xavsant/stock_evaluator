@@ -27,7 +27,6 @@ The backend of this project is hosted on Render, and the frontend on Streamlit. 
 - Sentiment Analysis
 ![Web Application](./notebooks/screenshots/Sentiment_Analysis_screenshot.png)
 
-> Sentiment Analysis function requires bug fixing
 
 ---
 
@@ -147,9 +146,9 @@ This difference is due to how file execution context affects module resolution b
 ---
 
 ### [6] Bugs
-- B1: Web scraping for Yahoo Finance is restricted for certain stocks, needs updates to `WebScraper`
+~~- B1: Web scraping for Yahoo Finance is restricted for certain stocks, needs updates to `WebScraper`~~
 - B2: Monte Carlo Simulations' explanatory text faces caching issues
-- B3: Web scraper is encountering issues with accessing information from Yahoo Finance, to look into it
+~~- B3: Web scraper is encountering issues with accessing information from Yahoo Finance, to look into it~~
 
 ---
 
