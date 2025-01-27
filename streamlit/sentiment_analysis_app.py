@@ -39,8 +39,13 @@ def article_colour(summary: str) -> str:
 
     return colour
 
+def get_overall_sentiment(sentiment_count: dict) -> str:
+    if sentiment_count['optimistic'] == sentiment_count['pessimistic']:
+        return 'neutral'
+    return max(sentiment_count, key=sentiment_count.get)
+
 def overall_sentiment(sentiment_summary_payload: dict) -> tuple:
-    summary = max(sentiment_summary_payload, key=sentiment_summary_payload.get)
+    summary = get_overall_sentiment(sentiment_summary_payload)
     colour = article_colour(summary)
 
     return summary, colour

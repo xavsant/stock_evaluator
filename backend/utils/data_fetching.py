@@ -33,8 +33,9 @@ class WebScraper:
     """
     def __init__(self, stock: str):
         self.stock = stock.strip().upper()
+        self.headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36'}
         self.url = "https://finance.yahoo.com/quote/"
-        with open(name2ticker_path, "rb") as f:
+        with open("name2ticker_dict.pkl", "rb") as f:
             self.name2ticker_dict = pickle.load(f)
         self.stock_name = None
         self.hyperlink_list = []
@@ -50,34 +51,34 @@ class WebScraper:
                     self.get_request(self.name2ticker_dict[name])
                     break
         if self.stock_name == None:
-            raise ValueError("Stock does not exist or could not accessed.")
+            raise ValueError("Stock does not exist or could not be accessed.")
         
     def get_request(self, url_extension: str) -> None:
-        response = requests.get(self.url + url_extension + '/')
+        response = requests.get(self.url + url_extension + '/news/', headers=self.headers)
         soup = BeautifulSoup(response.text, "lxml")
-        self.stock_name = soup.find("h1", class_="yf-xxbei9").text.strip()
-        self.hyperlink_list = [a["href"] for a in soup.find_all("a", class_="subtle-link fin-size-small thumb yf-1e4diqp")]
+        self.stock_name = soup.select_one('h1[class*="yf-"]').text.strip()
+        self.hyperlink_list = [a["href"] for a in soup.select('a[class*="subtle-link fin-size-small thumb"]')][0:12]
 
     def scrape_articles(self) -> None:
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36'}
         for hyperlink in self.hyperlink_list.copy():
             try:
+                for component in hyperlink.split("/"):
+                    if component == 'm': # removes articles with 'm' in the hyperlink because they indicate a redirected article
+                        raise ValueError
                 article = [] # each element in this list is a different paragraph
-                response = requests.get(hyperlink, headers=headers)
+                response = requests.get(hyperlink, headers=self.headers)
                 soup = BeautifulSoup(response.text, "lxml")
-                headline = soup.find("h1", class_="cover-title yf-1o1tx8g") # works for most yahoo finance articles
-                headline = headline.text.strip() if headline else None # returns None if the mainstream case above fails
-                if not headline: # special case for some yahoo tech articles where "Yahoo Tech" is the first h1 headline
-                    headline = next((h.text.strip() for h in soup.find_all("h1") if not h.text.strip().startswith("Yahoo")), None) # create an iterator object and return the first element that does not start with "Yahoo"
-                if headline:
-                    article.append(headline if headline[-1] in ".?!" else headline + ".")
+                headline = soup.select_one('div[class*="cover-title"]').text.strip() # returns headline if found but returns None otherwise
+                article.append(headline if headline[-1] in ".?!" else headline + ".")
                 for paragraph in soup.find_all("p"):
                     paragraph = paragraph.text.strip()
                     if paragraph:
                         article.append(paragraph if paragraph[-1] in ".?!" else paragraph + ".")
+                if len(article) <= 2: # if the number of elements scraped is less than or equal to 2, remove it because it likely indicates a premium or redirected article
+                    raise ValueError
                 self.headline_list.append(headline)
                 self.article_list.append(" ".join(article)) # use the join method to join all the separated header and paragraphs into one long string
-            except: # for cases where an article is locked behind a paywall or diverts the user to another news website
+            except: # remove cases where an article is locked behind a paywall or diverts the user to another news website
                 self.hyperlink_list.remove(hyperlink)
 
 class MonteCarlo_StockData:
