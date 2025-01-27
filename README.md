@@ -157,4 +157,4 @@ This difference is due to how file execution context affects module resolution b
 - **Fang-Yi Hsieh** - Monte Carlo Simulations Function
 - **Ling King** - Monte Carlo Simulations Function
 - **Nick Bernardini** - Black-Scholes-Merton Function
-- **Cheng Wei Hern Martin** - Sentiment Analysis Function
+- **[Cheng Wei Hern Martin](https://github.com/xavsant)** - Sentiment Analysis Function
