@@ -35,7 +35,7 @@ class WebScraper:
         self.stock = stock.strip().upper()
         self.headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36'}
         self.url = "https://finance.yahoo.com/quote/"
-        with open("name2ticker_dict.pkl", "rb") as f:
+        with open(name2ticker_path, "rb") as f:
             self.name2ticker_dict = pickle.load(f)
         self.stock_name = None
         self.hyperlink_list = []
