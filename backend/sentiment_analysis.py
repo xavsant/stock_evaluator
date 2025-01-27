@@ -66,7 +66,7 @@ class Stock_SentimentAnalysis:
         
         self.analyzer = SentimentAnalysis()
         self.articles = []
-        self.sentiment_count = {'optimistic': 0, 'neutral': 0, 'pessimistic': 0}
+        self.sentiment_count = {'optimistic': 0, 'pessimistic': 0, 'neutral': 0}
 
     def run(self):
         self.scraper.search_stock()
