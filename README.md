@@ -107,11 +107,11 @@ If any packages/dependencies are updated via poetry, be sure to export the requi
 
 #### **Import Behaviour in Different Environments:**
 
-*End-State*
-  When the app is running as a complete system (e.g., containerised in Docker, or through app.py or main.py), imports use **absolute file paths**. For example:
+*End-State*<br>
+When the app is running as a complete system (e.g., containerised in Docker, or through app.py or main.py), imports use **absolute file paths**. For example:
   `from backend.utils.data_fetching import WebScraper`
 
-*Running Individual Files*
+*Running Individual Files*<br>
   When running specific files like app.py or main.py independently, import paths need to be adjusted. For example:
   `from utils import WebScraper`
 
