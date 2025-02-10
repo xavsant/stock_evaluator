@@ -66,9 +66,12 @@ def display_response(sentiment_payload: dict):
     sentiment, colour = overall_sentiment(sentiment_payload["summary"])
 
     st.markdown(f'### {sentiment_payload["stock name"]}')
-    st.markdown(f'The overall sentiment of {sentiment_payload["stock name"]} is **{colour}[' + sentiment + ']**.')
 
-    display_articles(sentiment_payload["articles"])
+    if sum(sentiment_payload["summary"].values()) == 0:
+        st.markdown(f'There are currently no available news articles for {sentiment_payload["stock name"]} on Yahoo Finance. Please try again later.')
+    else:
+        st.markdown(f'The overall sentiment of {sentiment_payload["stock name"]} is **{colour}[' + sentiment + ']**.')
+        display_articles(sentiment_payload["articles"])
 
 # ---
 # Layout
